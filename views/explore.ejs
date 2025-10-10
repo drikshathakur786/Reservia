@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+    <html lang = "en">
+        <head>
+            <meta charset = "UTF-8">
+            <meta http-equiv = "X-UA-Compatible" content = "IE = edge">
+            <meta name = "viewport" content = "width = device-width, initial-scale = 1.0">
+
+            <title> Explore Restaurants - Reservia </title>
+
+            <link rel = "stylesheet" href = "/css/styles.css">
+            <link rel = "stylesheet" href = "/css/explore.css">
+            
+            <%-include("includes/explore.ejs")%>
+            <%-include("includes/styles.ejs")%>
+        </head>
+
+        <body>
+                <%-include("includes/header.ejs",{image:images})%>
+            <main>
+                <section class = "explore-hero">
+                    <div class = "container">
+                        <h1 class = "headline-1"> Discover Amazing Restaurants </h1>
+
+                        <div class = "search-filters">
+                            <div class = "search-bar">
+                                <input type = "text" placeholder = "Search restaurants..." class = "search-input">
+
+                                <button class = "search-btn" title = "search-bar">
+                                    <ion-icon name = "search-outline"></ion-icon>
+                                </button>
+                            </div>
+
+                            <div class = "filter-options">
+                                <select class = "filter-select" title = "select">
+                                    <option value = ""> Cuisine Type </option>
+                                    <option value = "italian"> Italian </option>
+                                    <option value = "indian"> Indian </option>
+                                    <option value = "chinese"> Chinese </option>
+                                    <option value = "french"> French </option>
+                                    <option value = "japanese"> Japanese </option>
+                                    <option value = "mexican"> Mexican </option>
+                                    <option value = "thai"> Thai </option>
+                                </select>
+
+                                <select class = "filter-select" title = "price">
+                                    <option value = ""> Price Range </option>
+                                    <option value = "0-25"> $0 - $25 </option>
+                                    <option value = "25-50"> $25 - $50 </option>
+                                    <option value = "50-100"> $50 - $100 </option>
+                                    <option value = "100+"> $100+ </option>
+                                </select>
+
+                                <select class = "filter-select" title = "Ratings">
+                                    <option value = ""> Rating </option>
+                                    <option value = "4plus"> 4+ Stars </option>
+                                    <option value = "3plus"> 3+ Stars </option>
+                                    <option value = "2plus"> 2+ Stars </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class = "restaurant-grid">
+                    <div class = "container">
+                        <div class = "grid-list" id = "restaurantList">
+                            <div class = "restaurant-card">
+                                <div class = "card-banner">
+                                    <img src = "<%=images[1]%>" alt ="La Belle Cuisine" class = "img-cover">
+
+                                    <span class = "badge"> Featured </span>
+                                </div>
+                                <div class = "card-content">
+                                    <h3 class = "title-3"> La Belle Cuisine </h3>
+
+                                    <div class = "restaurant-info">
+                                        <div class = "rating">
+                                            <ion-icon name = "star"></ion-icon>
+                                            <ion-icon name = "star"></ion-icon>
+                                            <ion-icon name = "star"></ion-icon>
+                                            <ion-icon name = "star"></ion-icon>
+                                            <ion-icon name = "star-half"></ion-icon>
+
+                                            <span> (4.5) </span>
+                                        </div>
+
+                                        <div class = "price"> $50 - $100 </div>
+                                    </div>
+
+                                    <p class = "cuisine-type"> French • Fine Dining </p>
+
+                                    <p class = "location">
+                                        <ion-icon name = "location-outline"></ion-icon>
+                                        123 Gourmet Street, Paris District
+                                    </p>
+
+                                    <div class = "card-footer">
+                                        <a href = "/reservation">
+                                            <button class = "btn btn-primary">
+                                                <span class = "text text-1"> Reserve Table </span>
+
+                                                <span class = "text text-2" aria-hidden = "true"> Reserve Table </span>
+                                            </button>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class = "restaurant-card">
+                                <div class = "card-banner">
+                                    <img src = "<%=images[2]%> " alt = "Sakura Sushi" class = "img-cover">
+                                </div>
+                                <div class = "card-content">
+                                    <h3 class = "title-3"> Sakura Sushi </h3>
+
+                                    <div class = "restaurant-info">
+                                        <div class = "rating">
+                                            <ion-icon name = "star"></ion-icon>
+                                            <ion-icon name = "star"></ion-icon>
+                                            <ion-icon name = "star"></ion-icon>
+                                            <ion-icon name = "star"></ion-icon>
+                                            <ion-icon name = "star-outline"></ion-icon>
+
+                                            <span> (4) </span>
+                                        </div>
+
+                                        <div class = "price"> $25 - $50 </div>
+                                    </div>
+
+                                    <p class = "cuisine-type"> Japanese • Sushi </p>
+
+                                    <p class = "location">
+                                        <ion-icon name = "location-outline"></ion-icon>
+                                        456 Ocean Avenue, Harbor District
+                                    </p>
+
+                                    <div class = "card-footer">
+                                        <a href = "/reservation">
+                                            <button class = "btn btn-primary">
+                                                <span class = "text text-1"> Reserve Table </span>
+
+                                                <span class = "text text-2" aria-hidden = "true"> Reserve Table </span>
+                                            </button>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class = "restaurant-card">
+                                <div class = "card-banner">
+                                    <img src = "<%=images[3]%>" alt = "Pasta Paradise" class = "img-cover">
+                                </div>
+                                <div class = "card-content">
+                                    <h3 class = "title-3"> Pasta Paradise </h3>
+
+                                    <div class = "restaurant-info">
+                                        <div class = "rating">
+                                            <ion-icon name = "star"></ion-icon>
+                                            <ion-icon name = "star"></ion-icon>
+                                            <ion-icon name = "star"></ion-icon>
+                                            <ion-icon name = "star"></ion-icon>
+                                            <ion-icon name = "star"></ion-icon>
+
+                                            <span>(5.0)</span>
+                                        </div>
+                                        <div class = "price"> $25 - $50 </div>
+                                    </div>
+
+                                    <p class = "cuisine-type"> Italian • Pasta </p>
+
+                                    <p class = "location">
+                                        <ion-icon name = "location-outline"></ion-icon>
+                                        789 Vineyard Lane, Italian Quarter
+                                    </p>
+
+                                    <div class = "card-footer">
+                                        <a href = "/reservation">
+                                            <button class = "btn btn-primary">
+                                                <span class = "text text-1"> Reserve Table </span>
+
+                                                <span class = "text text-2" aria-hidden = "true"> Reserve Table </span>
+                                            </button>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class = "restaurant-card">
+                                <div class = "card-banner">
+                                    <img src = "<%=images[4]%>" alt = "Spice Route" class = "img-cover">
+                                    
+                                    <span class = "badge"> Featured </span>
+                                </div>
+
+                                <div class = "card-content">
+                                    <h3 class = "title-3"> Spice Route </h3>
+
+                                    <div class = "restaurant-info">
+                                        <div class = "rating">
+                                            <ion-icon name = "star"></ion-icon>
+                                            <ion-icon name = "star"></ion-icon>
+                                            <ion-icon name = "star"></ion-icon>
+                                            <ion-icon name = "star"></ion-icon>
+                                            <ion-icon name = "star-half"></ion-icon>
+
+                                            <span> (4.8) </span>
+                                        </div>
+
+                                        <div class = "price"> $25 - $50 </div>
+                                    </div>
+
+                                    <p class = "cuisine-type"> Indian • Contemporary </p>
+
+                                    <p class = "location">
+                                        <ion-icon name = "location-outline"></ion-icon>
+                                        321 Curry Lane, Spice District
+                                    </p>
+
+                                    <div class = "card-footer">
+                                        <a href = "/reservation">
+                                            <button class = "btn btn-primary">
+                                                <span class = "text text-1"> Reserve Table </span>
+
+                                                <span class = "text text-2" aria-hidden = "true"> Reserve Table </span>
+                                            </button>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class = "restaurant-card">
+                                <div class = "card-banner">
+                                    <img src = "<%=images[5]%>" alt = "Dragon Palace" class = "img-cover">
+                                </div>
+
+                                <div class = "card-content">
+                                    <h3 class = "title-3"> Dragon Palace </h3>
+
+                                    <div class = "restaurant-info">
+                                        <div class = "rating">
+                                            <ion-icon name = "star"></ion-icon>
+                                            <ion-icon name = "star"></ion-icon>
+                                            <ion-icon name = "star"></ion-icon>
+                                            <ion-icon name = "star"></ion-icon>
+                                            <ion-icon name = "star-half"></ion-icon>
+
+                                            <span> (4.6) </span>
+                                        </div>
+
+                                        <div class = "price"> $50 - $100 </div>
+                                    </div>
+
+                                    <p class = "cuisine-type"> Chinese • Traditional </p>
+
+                                    <p class = "location">
+                                        <ion-icon name = "location-outline"></ion-icon>
+                                        567 Dragon Street, Asian Quarter
+                                    </p>
+
+                                    <div class = "card-footer">
+                                        <a href = "/reservation">
+                                            <button class = "btn btn-primary">
+                                                <span class = "text text-1"> Reserve Table </span>
+
+                                                <span class = "text text-2" aria-hidden = "true"> Reserve Table </span>
+                                            </button>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class = "restaurant-card">
+                                <div class = "card-banner">
+                                    <img src = "<%=images[6]%>" alt = "Mediterranean Dreams" class = "img-cover">
+                                </div>
+
+                                <div class = "card-content">
+                                    <h3 class = "title-3"> Mediterranean Dreams </h3>
+
+                                    <div class = "restaurant-info">
+                                        <div class = "rating">
+                                            <ion-icon name = "star"></ion-icon>
+                                            <ion-icon name = "star"></ion-icon>
+                                            <ion-icon name = "star"></ion-icon>
+                                            <ion-icon name = "star"></ion-icon>
+                                            <ion-icon name = "star-half"></ion-icon>
+
+                                            <span> (4.7) </span>
+                                        </div>
+
+                                        <div class = "price"> $25 - $50 </div>
+                                    </div>
+
+                                    <p class = "cuisine-type"> Mediterranean • Seafood </p>
+
+                                    <p class = "location">
+                                        <ion-icon name = "location-outline"></ion-icon>
+                                        890 Coastal Road, Beach District
+                                    </p>
+                                    
+                                    <div class = "card-footer">
+                                        <a href = "/reservation">
+                                            <button class = "btn btn-primary">
+                                                <span class = "text text-1"> Reserve Table </span>
+
+                                                <span class = "text text-2" aria-hidden = "true"> Reserve Table </span>
+                                            </button>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class = "restaurant-card">
+                                <div class = "card-banner">
+                                    <img src = "<%=images[7]%>" alt = "Taco Fiesta" class = "img-cover">
+                                </div>
+
+                                <div class = "card-content">
+                                    <h3 class = "title-3"> Taco Fiesta </h3>
+
+                                    <div class = "restaurant-info">
+                                        <div class = "rating">
+                                            <ion-icon name = "star"></ion-icon>
+                                            <ion-icon name = "star"></ion-icon>
+                                            <ion-icon name = "star"></ion-icon>
+                                            <ion-icon name = "star"></ion-icon>
+                                            <ion-icon name = "star-half"></ion-icon>
+
+                                            <span> (4.4) </span>
+                                        </div>
+
+                                        <div class = "price"> $0 - $25 </div>
+                                    </div>
+
+                                    <p class = "cuisine-type"> Mexican • Street Food </p>
+                                    
+                                    <p class = "location">
+                                        <ion-icon name = "location-outline"></ion-icon>
+                                        432 Salsa Avenue, Latino Quarter
+                                    </p>
+
+                                    <div class = "card-footer">
+                                        <a href = "/reservation">
+                                            <button class = "btn btn-primary">
+                                                <span class = "text text-1"> Reserve Table </span>
+
+                                                <span class = "text text-2" aria-hidden = "true"> Reserve Table </span>
+                                            </button>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class = "restaurant-card">
+                                <div class = "card-banner">
+                                    <img src = "<%=images[8]%>" alt = "Thai Orchid" class = "img-cover">
+                                </div>
+
+                                <div class = "card-content">
+                                    <h3 class = "title-3"> Thai Orchid </h3>
+
+                                    <div class = "restaurant-info">
+                                        <div class = "rating">
+                                            <ion-icon name = "star"></ion-icon>
+                                            <ion-icon name = "star"></ion-icon>
+                                            <ion-icon name = "star"></ion-icon>
+                                            <ion-icon name = "star"></ion-icon>
+                                            <ion-icon name = "star-half"></ion-icon>
+
+                                            <span> (4.3) </span>
+                                        </div>
+
+                                        <div class = "price"> $25 - $50 </div>
+                                    </div>
+
+                                    <p class = "cuisine-type"> Thai • Contemporary </p>
+
+                                    <p class = "location">
+                                        <ion-icon name = "location-outline"></ion-icon>
+                                        765 Bamboo Lane, Asian District
+                                    </p>
+
+                                    <div class = "card-footer">
+                                        <a href = "/reservation">
+                                            <button class = "btn btn-primary">
+                                                <span class = "text text-1"> Reserve Table </span>
+
+                                                <span class = "text text-2" aria-hidden = "true"> Reserve Table </span>
+                                            </button>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class = "restaurant-card">
+                                <div class = "card-banner">
+                                    <img src = "<%=images[9]%>" alt = "Le Petit Bistro" class = "img-cover">
+
+                                    <span class = "badge"> Featured </span>
+                                </div>
+
+                                <div class = "card-content">
+                                    <h3 class = "title-3"> Le Petit Bistro </h3>
+
+                                    <div class = "restaurant-info">
+                                        <div class = "rating">
+                                            <ion-icon name = "star"></ion-icon>
+                                            <ion-icon name = "star"></ion-icon>
+                                            <ion-icon name = "star"></ion-icon>
+                                            <ion-icon name = "star"></ion-icon>
+                                            <ion-icon name = "star-half"></ion-icon>
+
+                                            <span> (4.9) </span>
+                                        </div>
+
+                                        <div class = "price"> $100+ </div>
+                                    </div>
+                                    
+                                    <p class = "cuisine-type"> French • Classic </p>
+
+                                    <p class = "location">
+                                        <ion-icon name = "location-outline"></ion-icon>
+                                        234 Bistro Street, French Quarter
+                                    </p>
+
+                                    <div class = "card-footer">
+                                        <a href = "/reservation">
+                                            <button class = "btn btn-primary">
+                                                <span class = "text text-1"> Reserve Table </span>
+
+                                                <span class = "text text-2" aria-hidden = "true"> Reserve Table </span>
+                                            </button>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                       
+                        </div>
+                    </div>
+                </section>
+            </main>
+
+        <%-include("includes/footer.ejs",{image:images})%>
+            <script>import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+                import { getDatabase, ref, set, get, child } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
+                import { firebaseConfig } from './firebase-config.js';
+                // Initialize Firebase
+                const app = initializeApp(firebaseConfig);
+                const db = getDatabase(app);
+                // Store restaurant data in Firebase
+                const restaurants = [
+                    {
+                        id: "la-belle-cuisine",
+                        name: "La Belle Cuisine",
+                        rating: 4.5,
+                        priceRange: "$50 - $100",
+                        cuisine: "French • Fine Dining",
+                        location: "123 Gourmet Street, Paris District",
+                        image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4",
+                        featured: true
+                    },
+                    {
+                        id: "sakura-sushi",
+                        name: "Sakura Sushi",
+                        rating: 4.0,
+                        priceRange: "$25 - $50",
+                        cuisine: "Japanese • Sushi",
+                        location: "456 Ocean Avenue, Harbor District",
+                        image: "https://images.unsplash.com/photo-1552566626-52f8b828add9",
+                        featured: false
+                    },
+                    {
+                        id: "pasta-paradise",
+                        name: "Pasta Paradise",
+                        rating: 5.0,
+                        priceRange: "$25 - $50",
+                        cuisine: "Italian • Pasta",
+                        location: "789 Vineyard Lane, Italian Quarter",
+                        image: "https://images.unsplash.com/photo-1514933651103-005eec06c04b",
+                        featured: false
+                    },
+                    {
+                        id: "spice-route",
+                        name: "Spice Route",
+                        rating: 4.8,
+                        priceRange: "$25 - $50",
+                        cuisine: "Indian • Contemporary",
+                        location: "321 Curry Lane, Spice District",
+                        image: "https://images.unsplash.com/photo-1585937421612-70a008356fbe",
+                        featured: true
+                    },
+                    {
+                        id: "dragon-palace",
+                        name: "Dragon Palace",
+                        rating: 4.6,
+                        priceRange: "$50 - $100",
+                        cuisine: "Chinese • Traditional",
+                        location: "567 Dragon Street, Asian Quarter",
+                        image: "https://images.unsplash.com/photo-1552566626-52f8b828add9",
+                        featured: false
+                    },
+                    {
+                        id: "mediterranean-dreams",
+                        name: "Mediterranean Dreams",
+                        rating: 4.7,
+                        priceRange: "$25 - $50",
+                        cuisine: "Mediterranean • Seafood",
+                        location: "890 Coastal Road, Beach District",
+                        image: "https://images.unsplash.com/photo-1544148103-0773bf10d330",
+                        featured: false
+                    },
+                    {
+                        id: "taco-fiesta",
+                        name: "Taco Fiesta",
+                        rating: 4.4,
+                        priceRange: "$0 - $25",
+                        cuisine: "Mexican • Street Food",
+                        location: "432 Salsa Avenue, Latino Quarter",
+                        image: "https://images.unsplash.com/photo-1565299585323-38d6b0865b47",
+                        featured: false
+                    },
+                    {
+                        id: "thai-orchid",
+                        name: "Thai Orchid",
+                        rating: 4.3,
+                        priceRange: "$25 - $50",
+                        cuisine: "Thai • Contemporary",
+                        location: "765 Bamboo Lane, Asian District",
+                        image: "https://images.unsplash.com/photo-1532347922424-c652d9b7208e",
+                        featured: false
+                    },
+                    {
+                        id: "le-petit-bistro",
+                        name: "Le Petit Bistro",
+                        rating: 4.9,
+                        priceRange: "$100+",
+                        cuisine: "French • Classic",
+                        location: "234 Bistro Street, French Quarter",
+                        image: "https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c",
+                        featured: true
+                    }
+                ];
+                
+                
+                // Function to initialize restaurant data
+                async function initializeRestaurants() {
+                  try {
+                    const dbRef = ref(db);
+                    const snapshot = await get(child(dbRef, 'restaurants'));
+                    
+                    if (!snapshot.exists()) {
+                      await set(ref(db, 'restaurants'), restaurants);
+                      console.log('Restaurants data initialized');
+                    }
+                    loadRestaurants();
+                  } catch (error) {
+                    console.error('Error initializing restaurants:', error);
+                  }
+                }
+                
+                async function loadRestaurants() {
+                    try {
+                        const dbRef = ref(db);
+                        const snapshot = await get(child(dbRef, 'restaurants'));
+                        
+                        if (snapshot.exists()) {
+                            const restaurantList = document.getElementById('restaurantList');
+                            restaurantList.innerHTML = ''; // Clear existing content
+                            
+                            const restaurants = Object.values(snapshot.val());
+                            restaurants.forEach(restaurant => {
+                                const card = createRestaurantCard(restaurant);
+                                restaurantList.insertAdjacentHTML('beforeend', card);
+                            });
+                        }
+                    } catch (error) {
+                        console.error('Error loading restaurants:', error);
+                    }
+                }
+                
+                function createRestaurantCard(restaurant) {
+                    return `
+                        <div class="restaurant-card" data-restaurant-id="${restaurant.id}">
+                            <div class="card-banner">
+                                <img src="${restaurant.image}" alt="${restaurant.name}" class="img-cover">
+                                ${restaurant.featured ? '<span class="badge">Featured</span>' : ''}
+                            </div>
+                            <div class="card-content">
+                                <h3 class="title-3">${restaurant.name}</h3>
+                                <div class="restaurant-info">
+                                    <div class="rating">
+                                        ${createStarRating(restaurant.rating)}
+                                        <span>(${restaurant.rating})</span>
+                                    </div>
+                                    <div class="price">${restaurant.priceRange}</div>
+                                </div>
+                                <p class="cuisine-type">${restaurant.cuisine}</p>
+                                <p class="location">
+                                    <ion-icon name="location-outline"></ion-icon>
+                                    ${restaurant.location}
+                                </p>
+                                <div class="card-footer">
+                                    <a href="/res.html">
+                                        <button class="btn btn-primary">
+                                            <span class="text text-1">Reserve Table</span>
+                                            <span class="text text-2" aria-hidden="true">Reserve Table</span>
+                                        </button>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                function createStarRating(rating) {
+                    const fullStars = Math.floor(rating);
+                    const hasHalfStar = rating % 1 !== 0;
+                    let stars = '';
+                    
+                    for (let i = 0; i < fullStars; i++) {
+                        stars += '<ion-icon name="star"></ion-icon>';
+                    }
+                    
+                    if (hasHalfStar) {
+                        stars += '<ion-icon name="star-half"></ion-icon>';
+                    }
+                    
+                    const remainingStars = 5 - Math.ceil(rating);
+                    for (let i = 0; i < remainingStars; i++) {
+                        stars += '<ion-icon name="star-outline"></ion-icon>';
+                    }
+                    
+                    return stars;
+                }
+                
+                // Function to filter restaurants
+                function filterRestaurants(cuisine = '', price = '', rating = '') {
+                  const restaurantList = document.getElementById('restaurantList');
+                  const searchInput = document.querySelector('.search-input').value.toLowerCase();
+                
+                  restaurants.forEach(restaurant => {
+                    const card = document.querySelector(`[data-restaurant-id="${restaurant.id}"]`);
+                    if (!card) return;
+                
+                    const matchesSearch = restaurant.name.toLowerCase().includes(searchInput) ||
+                                         restaurant.cuisine.toLowerCase().includes(searchInput);
+                    const matchesCuisine = !cuisine || restaurant.cuisine.toLowerCase().includes(cuisine.toLowerCase());
+                    const matchesPrice = !price || restaurant.priceRange === price;
+                    const matchesRating = !rating || restaurant.rating >= parseFloat(rating);
+                
+                    if (matchesSearch && matchesCuisine && matchesPrice && matchesRating) {
+                      card.style.display = 'block';
+                    } else {
+                      card.style.display = 'none';
+                    }
+                  });
+                }
+                
+                // Event listeners
+                document.addEventListener('DOMContentLoaded', () => {
+                  initializeRestaurants();
+                
+                  // Search functionality
+                  const searchInput = document.querySelector('.search-input');
+                  searchInput?.addEventListener('input', () => filterRestaurants());
+                
+                  // Filter functionality
+                  const filterSelects = document.querySelectorAll('.filter-select');
+                  filterSelects.forEach(select => {
+                    select?.addEventListener('change', () => {
+                      const cuisine = document.querySelector('select[value="cuisine"]')?.value || '';
+                      const price = document.querySelector('select[value="price"]')?.value || '';
+                      const rating = document.querySelector('select[value="rating"]')?.value || '';
+                      filterRestaurants(cuisine, price, rating);
+                    });
+                  });
+                });
+                
+                document.addEventListener('DOMContentLoaded', () => {
+                    const searchInput = document.querySelector('.search-input');
+                    const searchBtn = document.querySelector('.search-btn');
+                    const filters = document.querySelectorAll('.filter-select');
+                    const restaurantList = document.getElementById('restaurantList');
+                    const allRestaurants = [...restaurantList.children];
+                
+                    function debounce(func, delay) {
+                        let timeout;
+                        return (...args) => {
+                            clearTimeout(timeout);
+                            timeout = setTimeout(() => func.apply(this, args), delay);
+                        };
+                    }
+                
+                    function filterRestaurants() {
+                        const searchTerm = searchInput.value.toLowerCase().trim();
+                        const selectedCuisine = filters[0].value.toLowerCase();
+                        const selectedPrice = filters[1].value;
+                        const selectedRating = filters[2].value;
+                
+                        allRestaurants.forEach((restaurant) => {
+                            const restaurantName = restaurant.querySelector('.title-3').textContent.toLowerCase();
+                            const cuisineType = restaurant.querySelector('.cuisine-type').textContent.toLowerCase();
+                            const location = restaurant.querySelector('.location').textContent.toLowerCase();
+                            const price = restaurant.querySelector('.price').textContent;
+                            const priceNum = getPriceRange(price);
+                            const rating = parseFloat(restaurant.querySelector('.rating span').textContent.replace(/[()]/g, ''));
+                
+                            const matchesSearch =
+                                !searchTerm ||
+                                [restaurantName, cuisineType, location].some((text) => text.includes(searchTerm));
+                            const matchesCuisine = !selectedCuisine || cuisineType.includes(selectedCuisine);
+                            const matchesPrice = !selectedPrice || isPriceInRange(priceNum, selectedPrice);
+                            const matchesRating = !selectedRating || isRatingSufficient(rating, selectedRating);
+                
+                            restaurant.style.display = matchesSearch && matchesCuisine && matchesPrice && matchesRating ? '' : 'none';
+                        });
+                    }
+                
+                    function getPriceRange(priceText) {
+                        const prices = (priceText.match(/\d+/g) || []).map(Number);
+                        return prices.length ? Math.max(...prices) : 0;
+                    }
+                
+                    function isPriceInRange(price, range) {
+                        switch (range) {
+                            case '0-25':
+                                return price <= 25;
+                            case '25-50':
+                                return price > 25 && price <= 50;
+                            case '50-100':
+                                return price > 50 && price <= 100;
+                            case '100+':
+                                return price > 100;
+                            default:
+                                return true;
+                        }
+                    }
+                
+                    function isRatingSufficient(rating, threshold) {
+                        switch (threshold) {
+                            case '4plus':
+                                return rating >= 4;
+                            case '3plus':
+                                return rating >= 3;
+                            case '2plus':
+                                return rating >= 2;
+                            default:
+                                return true;
+                        }
+                    }
+                
+                    const debouncedFilter = debounce(filterRestaurants, 300);
+                
+                    searchBtn.addEventListener('click', filterRestaurants);
+                    searchInput.addEventListener('keyup', (e) => {
+                        if (e.key === 'Enter') filterRestaurants();
+                        else debouncedFilter();
+                    });
+                    filters.forEach((filter) => filter.addEventListener('change', filterRestaurants));
+                
+                    // Initial filter
+                    filterRestaurants();
+                });
+                </script>
+            <script type = "module" src = "https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+            <script nomodule src = "https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+        </body>
+    </html>

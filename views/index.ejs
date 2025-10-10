@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+    <html lang = "en">
+        <head>
+            <meta charset = "UTF-8">
+            <meta http-equiv = "X-UA-Compatible" content = "IE = edge">
+            <meta name = "viewport" content = "width = device-width, initial-scale = 1.0">
+
+            <title> Reservia- Book Your Perfect Table </title>
+
+            <meta name = "title" content = "Reservia- Book Your Perfect Table">
+            <meta name = "description" content = "Reservia helps you book tables, select music, and set special requests effortlessly.">
+
+            <link rel = "shortcut icon" href ="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSU5zQzIc0nbzV04ns-mz3q7PwWJUYHLyHyQA&s" type = "image/x-icon">
+
+            <link href = "https://fonts.googleapis.com/css2?family = Cinzel:wght@700&display = swap" rel = "stylesheet">
+            <link href = "https://fonts.googleapis.com/css2?family = Roboto:wght@500&display = swap" rel = "stylesheet">
+
+
+            <link rel = "preconnect" href = "https://fonts.googleapis.com">
+            <link rel = "preconnect" href = "https://fonts.gstatic.com" crossorigin>
+            <link href = "https://fonts.googleapis.com/css2?family = DM+Sans:wght@400;700&family = Forum&display = swap" rel = "stylesheet">
+
+            <%-include("includes/styles.ejs")%>
+
+            <link rel = "preload" as = "image" href = "<%= images[0] %>">
+            <link rel = "preload" as = "image" href = "<%= images[1] %>">
+            <link rel = "preload" as = "image" href = "<%= images[2] %>">
+            <link rel = "preload" as = "image" href = "<%=images[2]%>">
+        </head>
+
+        <body id = "top">
+            <div class = "preload" data-preaload>
+                <div class = "circle"></div>
+                <p class = "text"> Reservia </p>
+            </div>
+            <%-include("includes/header.ejs",{image:images})%>
+            <main>
+                <article>
+                    <section class = "hero text-center" aria-label = "home" id = "home">
+                        <ul class = "hero-slider" data-hero-slider>
+                            <li class = "slider-item active" data-hero-slider-item>
+                                <div class = "slider-bg">
+                                <img src = "<%=images[1]%>" width = "1880" height = "950" alt = "Elegant dining area" class = "img-cover">
+                                </div>
+
+                                <p class = "label-2 section-subtitle slider-reveal"> Reserve. Relax. Rejoice. </p>
+
+                                <h1 class = "display-1 hero-title slider-reveal">
+                                    Simplify Your <br> Dining Experience
+                                </h1>
+
+                                <p class = "main-slider body-2 hero-text slider-reveal">
+                                    Book your table, customize your ambiance, and savor every moment with Reservia.
+                                </p>
+
+                                <a href = "#features" class = "btn btn-primary slider-reveal">
+                                    <span class = "text text-1">Explore Features</span>
+                                    <span class = "text text-2" aria-hidden = "true"> Explore Features </span>
+                                </a>
+                            </li>
+
+                            <li class = "slider-item" data-hero-slider-item>
+                                <div class = "slider-bg">
+                                    <img src = "<%=images[3]%>" width = "1880" height = "950" alt = "Cozy dining table setup" class = "img-cover">
+                                </div>
+
+                                <p class = "label-2 section-subtitle slider-reveal"> Ambiance Tailored to You </p>
+
+                                <h1 class = "display-1 hero-title slider-reveal">
+                                    Create the Perfect <br> Dining Vibes
+                                </h1>
+
+                                <p class = "main-slider body-2 hero-text slider-reveal">
+                                    Choose your favorite music and make special requests to enhance your experience.
+                                </p>
+                            </li>
+
+                            <li class = "slider-item" data-hero-slider-item>
+                                <div class = "slider-bg">
+                                    <img src = "<%=images[2]%>" width = "1880" height = "950" alt = "Delicious food setup" class = "img-cover">
+                                </div>
+
+                                <p class = "label-2 section-subtitle slider-reveal"> Unforgettable Flavors </p>
+
+                                <h1 class = "display-1 hero-title slider-reveal">
+                                    Every Meal <br> Crafted to Perfection
+                                </h1>
+
+                                <p class = "main-slider body-2 hero-text slider-reveal">
+                                    Indulge in mouthwatering dishes and exceptional service with Reservia.
+                                </p>
+
+                                <a href = "#menu" class = "btn btn-primary slider-reveal">
+                                    <span class = "text text-1"> View Menu </span>
+                                    <span class = "text text-2" aria-hidden = "true"> View Menu </span>
+                                </a>
+                            </li>
+                        </ul>
+
+                        <button class = "slider-btn prev" aria-label = "slide to previous" data-prev-btn>
+                            <ion-icon name = "chevron-back"></ion-icon>
+                        </button>
+
+                        <button class = "slider-btn next" aria-label = "slide to next" data-next-btn>
+                            <ion-icon name = "chevron-forward"></ion-icon>
+                        </button>
+                    </section>
+                </article>
+
+                <section class = "section about text-center" aria-labelledby = "about-label" id = "about">
+                    <div class = "container">
+                        <div class = "about-content">
+                            <p class = "label-2 section-subtitle" id = "about-label"> Our Story </p>
+
+                            <h2 class = "headline-1 section-title"> Where Every Reservation is an Experience </h2>
+
+                            <p class = "section-text">
+                                At Reservia, we believe that dining is more than just a meal—it's an experience. From the moment you book a table to the final bite, we are dedicated to ensuring every moment is special. Our journey began with a vision to make restaurant bookings seamless, and today, we offer more than just a reservation system; we offer an experience curated to your desires. Whether you're choosing your favorite seat, setting the perfect ambiance, or requesting a special touch, we’re here to create memories that last.
+                            </p>
+
+                            <div class = "contact-label"> Need Assistance? Call Us </div>
+
+                            <a href = "tel:+804001234567" class = "body-1 contact-number hover-underline"> +80 (400) 123 4567 </a>
+
+                            <a href = "#" class = "btn btn-primary">
+                                <span class = "text text-1"> Discover More </span>
+                                <span class = "text text-2" aria-hidden = "true"> Discover More </span>
+                            </a> 
+                        </div>
+
+                        <figure class = "about-banner">
+                            <img src ="<%= images[4] %>"  width = "570" height = "570" loading = "lazy" alt = "about banner" class = "w-100" data-parallax-item data-parallax-speed = "1">
+
+                            <div class = "abs-img abs-img-1 has-before" data-parallax-item data-parallax-speed = "1.75">
+                                <img src = "<%=images[5]%>" width = "285" height = "285" loading = "lazy" alt = "" class = "w-100">
+                            </div>
+
+                            <div class = "abs-img abs-img-2 has-before">
+                                <img src = "<%= images[6] %>" width = "133" height = "134" loading = "lazy" alt = "">
+                            </div>
+                        </figure>
+                    </div>
+                </section>
+
+                <section class = "section menu" aria-label = "menu-label" id = "menu">
+                    <div class = "container">
+                        <p class = "section-subtitle text-center label-2"> Featured Experiences </p>
+
+                        <h2 class = "headline-1 section-title text-center"> Curated Dining Moments </h2>
+
+                        <ul class = "grid-list">
+                            <li>
+                                <div class = "menu-card hover:card">
+                                    <figure class = "card-banner img-holder" style = "--width: 10; --height: 10;">
+                                        <img src = "<%=images[7]%>" width = "100" height = "100" loading = "lazy" alt = "Intimate Dining" class = "img-cover">
+                                    </figure>
+
+                                    <div>
+                                        <div class = "title-wrapper">
+                                            <h3 class = "title-3">
+                                                <a href = "#" class = "card-title"> Intimate Dining </a>
+                                            </h3>
+
+                                            <span class = "badge label-1"> Private </span>
+
+                                            <span class = "span title-2"> $50.00 </span>
+                                        </div>
+                                        <p class = "card-text label-1">
+                                            Enjoy a private dining experience with tailored ambiance, perfect for anniversaries and special occasions.
+                                        </p>
+                                    </div>
+                                </div>
+                            </li>
+
+                            <li>
+                                <div class = "menu-card hover:card">
+                                    <figure class = "card-banner img-holder" style = "--width: 100; --height: 100;">
+                                        <img src = "<%=images[12]%>" width = "100" height = "100" loading = "lazy" alt = "Romantic Dinner" class = "img-cover">
+                                    </figure>
+
+                                    <div>
+                                        <div class = "title-wrapper">
+                                            <h3 class = "title-3">
+                                                <a href = "#" class = "card-title"> Romantic Dinner </a>
+                                            </h3>
+
+                                            <span class = "span title-2"> $80.00 </span>
+                                        </div>
+
+                                        <p class = "card-text label-1">
+                                            Set the mood with ambient lighting, music, and a specially curated menu for two.
+                                        </p>
+                                    </div>
+                                </div>
+                            </li>
+
+                            <li>
+                                <div class = "menu-card hover:card">
+                                    <figure class = "card-banner img-holder" style = "--width: 100; --height: 100;">
+                                        <img src = "<%=images[9]%>" width = "100" height = "100" loading = "lazy" alt = "Family Feast" class = "img-cover">
+                                    </figure>
+
+                                    <div>
+                                        <div class = "title-wrapper">
+                                            <h3 class = "title-3">
+                                                <a href = "#" class = "card-title"> Family Feast </a>
+                                            </h3>
+
+                                            <span class = "span title-2"> $120.00 </span>
+                                        </div>
+
+                                        <p class = "card-text label-1">
+                                            A family-style dinner with a wide variety of dishes, served in an inviting and cozy setting.
+                                        </p>
+                                    </div>
+                                </div>
+                            </li>
+
+                            <li>
+                                <div class = "menu-card hover:card">
+                                    <figure class = "card-banner img-holder" style = "--width: 100; --height: 100;">
+                                        <img src = "<%=images[10]%>" width = "100" height = "100" loading = "lazy" alt = "Outdoor Dining" class = "img-cover">
+                                    </figure>
+
+                                    <div>
+                                        <div class = "title-wrapper">
+                                            <h3 class = "title-3">
+                                                <a href = "#" class = "card-title"> Outdoor Dining </a>
+                                            </h3>
+
+                                            <span class = "badge label-1"> New </span>
+
+                                            <span class = "span title-2"> $75.00 </span>
+                                        </div>
+
+                                        <p class = "card-text label-1">
+                                            Dine under the stars with fresh air, stunning views, and a menu designed for outdoor enjoyment.
+                                        </p>
+                                    </div>
+                                </div>
+                            </li>
+
+                            <li>
+                                <div class = "menu-card hover:card">
+                                    <figure class = "card-banner img-holder" style = "--width: 100; --height: 100;">
+                                        <img src = "<%=images[11]%>" width = "100" height = "100" loading = "lazy" alt = "Custom Ambiance" class = "img-cover">
+                                    </figure>
+
+                                    <div>
+                                        <div class = "title-wrapper">
+                                            <h3 class = "title-3">
+                                                <a href = "#" class = "card-title"> Custom Ambiance </a>
+                                            </h3>
+
+                                            <span class = "span title-2"> $30.00 </span>
+                                        </div>
+
+                                        <p class = "card-text label-1">
+                                            Customize the mood of your dining experience with personalized lighting, music, and decor choices.
+                                        </p>
+                                    </div>
+                                </div>
+                            </li>
+
+                            <li>
+                                <div class = "menu-card hover:card">
+                                    <figure class = "card-banner img-holder" style = "--width: 100; --height: 100;">
+                                        <img src = "<%=images[12]%>" width = "100" height = "100" loading = "lazy" alt = "Wine Pairing" class = "img-cover">
+                                    </figure>
+
+                                    <div>
+                                        <div class = "title-wrapper">
+                                            <h3 class = "title-3">
+                                                <a href = "#" class = "card-title"> Wine Pairing </a>
+                                            </h3>
+                                            <span class = "span title-2"> $45.00 </span>
+                                        </div>
+
+                                        <p class = "card-text label-1">
+                                            Pair your meal with the perfect wine selection chosen by our expert sommeliers.
+                                        </p>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+
+                        <p class = "menu-text text-center">
+                            Available for reservations daily from <span class = "span">7:00 pm</span> to <span class = "span">10:00 pm</span>
+                        </p>
+
+                        <a href = "#" class = "btn btn-primary">
+                            <span class = "text text-1"> Book Your Experience </span>
+                            <span class = "text text-2" aria-hidden = "true"> Book Your Experience </span>
+                        </a>
+
+                        <img src = "<%=images[13]%>" width = "921" height = "1036" loading = "lazy" alt = "shape" class = "shape shape-2 move-anim">
+                        <img src = "<%=images[14]%>" width = "343" height = "345" loading = "lazy" alt = "shape" class = "shape shape-3 move-anim">
+                    </div>
+                </section>
+
+                <section class = "reservation">
+                    <div class = "container">
+                        <div class = "form reservation-form bg-black-10">
+                            <form action = "" class = "form-left">
+                                <h2 class = "headline-1 text-center"> Book Your Table </h2>
+
+                                <p class = "form-text text-center">
+                                    Have questions? Call us at <a href = "tel:+911234567890" class = "link"> +91-123-456-7890 </a> 
+                                    or fill out the reservation form below.
+                                </p>
+
+                                <div class = "input-wrapper">
+                                    <input type = "text" name = "name" placeholder = "Your Name" autocomplete = "off" class = "input-field">
+
+                                    <input type = "tel" name = "phone" placeholder = "Phone Number" autocomplete = "off" class = "input-field">
+                                </div>
+
+                                <div class = "input-wrapper">
+                                    <div class = "icon-wrapper">
+                                        <ion-icon name = "person-outline" aria-hidden = "true"></ion-icon>
+
+                                        <select name = "person" class = "input-field">
+                                            <option value = "1-person"> 1 Person </option>
+                                            <option value = "2-person"> 2 People </option>
+                                            <option value = "3-person"> 3 People </option>
+                                            <option value = "4-person"> 4 People </option>
+                                            <option value = "5-person"> 5 People </option>
+                                            <option value = "6-person"> 6 People </option>
+                                            <option value = "7-person"> 7+ People </option>
+                                        </select>
+
+                                        <ion-icon name = "chevron-down" aria-hidden = "true"></ion-icon>
+                                    </div>
+
+                                    <div class = "icon-wrapper">
+                                        <ion-icon name = "calendar-clear-outline" aria-hidden = "true"></ion-icon>
+
+                                        <input type = "date" name = "reservation-date" class = "input-field">
+
+                                        <ion-icon name = "chevron-down" aria-hidden = "true"></ion-icon>
+                                    </div>
+
+                                    <div class = "icon-wrapper">
+                                        <ion-icon name = "time-outline" aria-hidden = "true"></ion-icon>
+
+                                        <select name = "time" class = "input-field">
+                                            <option value = "08:00am"> 08 : 00 am </option>
+                                            <option value = "09:00am"> 09 : 00 am </option>
+                                            <option value = "10:00am"> 10 : 00 am </option>
+                                            <option value = "11:00am"> 11 : 00 am </option>
+                                            <option value = "12:00pm"> 12 : 00 pm </option>
+                                            <option value = "01:00pm"> 01 : 00 pm </option>
+                                            <option value = "02:00pm"> 02 : 00 pm </option>
+                                            <option value = "03:00pm"> 03 : 00 pm </option>
+                                            <option value = "04:00pm"> 04 : 00 pm </option>
+                                            <option value = "05:00pm"> 05 : 00 pm </option>
+                                            <option value = "06:00pm"> 06 : 00 pm </option>
+                                            <option value = "07:00pm"> 07 : 00 pm </option>
+                                            <option value = "08:00pm"> 08 : 00 pm </option>
+                                            <option value = "09:00pm"> 09 : 00 pm </option>
+                                            <option value = "10:00pm"> 10 : 00 pm </option>
+                                        </select>
+
+                                        <ion-icon name = "chevron-down" aria-hidden = "true"></ion-icon>
+                                    </div>
+                                </div>
+
+                                <textarea name = "message" placeholder = "Special Requests (Optional)" autocomplete = "off" class = "input-field"></textarea>
+
+                                <button type = "submit" class = "btn btn-secondary">
+                                    <span class = "text text-1"> Reserve Now </span>
+
+                                    <span class = "text text-2" aria-hidden = "true"> Reserve Now </span>
+                                </button>
+                            </form>
+
+                            <div class = "form-right text-center" style = "background-image: url('images/HomePageImages/form-pattern.png')">
+                                <h2 class = "headline-1 text-center"> Contact Us </h2>
+
+                                <p class = "contact-label"> Reservation Hotline </p>
+
+                                <a href = "tel:+911234567890" class = "body-1 contact-number hover-underline"> +91 1234567890 </a>
+
+                                <div class = "separator"></div>
+                                    <p class = "contact-label"> Working Hours </p>
+
+                                    <p class = "body-4">
+                                        Monday to Sunday <br>
+                                        Lunch: 12:00 pm - 3:00 pm <br>
+                                        Dinner: 6:00 pm - 11:00 pm
+                                    </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class = "section features text-center" aria-label = "features">
+                    <div class = "container">
+                        <p class = "section-subtitle label-2"> Why Choose Reservia </p>
+
+                        <h2 class = "headline-1 section-title"> Our Strengths </h2>
+
+                        <ul class = "grid-list">
+                            <li class = "feature-item">
+                                <div class = "feature-card">
+                                    <div class = "card-icon">
+                                        <img src = "<%=images[15]%>" width = "100" height = "80" loading = "lazy" alt = "Hygienic Food Icon">
+                                    </div>
+
+                                    <h3 class = "title-2 card-title"> Hygienic Food </h3>
+
+                                    <p class = "label-1 card-text"> We prioritize cleanliness and follow strict hygiene standards to ensure safe and delicious meals. </p>
+                                </div>
+                            </li>
+
+                            <li class = "feature-item">
+                                <div class = "feature-card">
+                                    <div class = "card-icon">
+                                        <img src = "<%=images[16]%>" width = "100" height = "80" loading = "lazy" alt = "Fresh Environment Icon">
+                                    </div>
+
+                                    <h3 class = "title-2 card-title"> Relaxing Ambience </h3>
+
+                                    <p class = "label-1 card-text"> Experience a serene and comfortable dining atmosphere that enhances your culinary journey. </p>
+                                </div>
+                            </li>
+
+                            <li class = "feature-item">
+                                <div class = "feature-card">
+                                    <div class = "card-icon">
+                                        <img src = "<%=images[17]%>" width = "100" height = "80" loading = "lazy" alt = "Skilled Chefs Icon">
+                                    </div>
+
+                                    <h3 class = "title-2 card-title"> Expert Chefs </h3>
+
+                                    <p class = "label-1 card-text"> Our chefs are highly skilled, blending innovation and tradition to create exquisite dishes. </p>
+                                </div>
+                            </li>
+
+                            <li class = "feature-item">
+                                <div class = "feature-card">
+                                    <div class = "card-icon">
+                                        <img src = "<%=images[18]%>" width = "100" height = "80" loading = "lazy" alt = "Event & Party Icon">
+                                    </div>
+
+                                    <h3 class = "title-2 card-title"> Event & Party Hosting </h3>
+
+                                    <p class = "label-1 card-text"> From private dinners to grand celebrations, we provide tailored event solutions to suit your needs. </p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section class = "section event bg-black-10" aria-label = "event">
+                    <div class = "container">
+                        <p class = "section-subtitle label-2 text-center"> Latest Happenings </p>
+
+                        <h2 class = "section-title headline-1 text-center"> Upcoming Events </h2>
+
+                        <ul class = "grid-list">
+                            <li>
+                                <div class = "event-card has-before hover:shine">
+                                    <div class = "card-banner img-holder" style = "--width: 350; --height: 450;">
+                                        <img src = "<%=images[19]%>" width = "350" height = "450" loading = "lazy"
+                                        alt = "Exclusive wine tasting night at Reservia." class = "img-cover">
+
+                                        <time class = "publish-date label-2" datetime = "2024-12-25"> 25/12/2024 </time>
+                                    </div>
+
+                                    <div class = "card-content">
+                                        <p class = "card-subtitle label-2 text-center"> Wine Tasting </p>
+
+                                        <h3 class = "card-title title-2 text-center">
+                                            Exclusive wine tasting night at Reservia.
+                                        </h3>
+                                    </div>
+                                </div>
+                            </li>
+
+                            <li>
+                                <div class = "event-card has-before hover:shine">
+                                    <div class = "card-banner img-holder" style = "--width: 350; --height: 450;">
+                                        <img src = "<%=images[20]%>" width = "350" height = "450" loading = "lazy"
+                                        alt = "Live jazz music evening at Reservia." class = "img-cover">
+
+                                        <time class = "publish-date label-2" datetime = "2024-12-31"> 31/12/2024 </time>
+                                    </div>
+
+                                    <div class = "card-content">
+                                        <p class = "card-subtitle label-2 text-center"> Live Music </p>
+
+                                        <h3 class = "card-title title-2 text-center">
+                                            Live jazz music evening at Reservia.
+                                        </h3>
+                                    </div>
+                                </div>
+                            </li>
+
+                            <li>
+                                <div class = "event-card has-before hover:shine">
+                                    <div class = "card-banner img-holder" style = "--width: 350; --height: 450;">
+                                        <img src = "<%=images[21]%>" width = "350" height = "450" loading = "lazy"
+                                        alt = "Cooking masterclass by top chefs at Reservia." class = "img-cover">
+
+                                        <time class = "publish-date label-2" datetime = "2025-01-05"> 05/01/2025 </time>
+                                    </div>
+
+                                    <div class = "card-content">
+                                        <p class = "card-subtitle label-2 text-center"> Cooking Class </p>
+
+                                        <h3 class = "card-title title-2 text-center">
+                                            Cooking masterclass by top chefs at Reservia.
+                                        </h3>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+
+                        <a href = "#" class = "btn btn-primary">
+                            <span class = "text text-1"> Explore More Events </span>
+
+                            <span class = "text text-2" aria-hidden = "true"> Explore More Events </span>
+                        </a>
+                    </div>
+                </section>
+            </main>
+
+            <%-include("includes/footer.ejs",{image:images})%>
+
+
+            <a href = "#top" class = "back-top-btn active" aria-label = "back to top" data-back-top-btn>
+                <ion-icon name = "chevron-up" aria-hidden = "true"></ion-icon>
+            </a>
+
+                <script>
+                'use strict';
+
+                const preloader = document.querySelector("[data-preaload]");
+
+                window.addEventListener("load", () => {
+                preloader.classList.add("loaded");
+                document.body.classList.add("loaded");
+                });
+
+                const addEventOnElements = function (elements, eventType, callback) {
+                for (let i = 0, len = elements.length; i < len; i++) {
+                elements[i].addEventListener(eventType, callback);
+                }
+                }
+
+                const navbar = document.querySelector("[data-navbar]");
+                const navTogglers = document.querySelectorAll("[data-nav-toggler]");
+                const overlay = document.querySelector("[data-overlay]");
+
+                const toggleNavbar = () => {
+                navbar.classList.toggle("active");
+                overlay.classList.toggle("active");
+                document.body.classList.toggle("nav-active");
+                }
+
+                addEventOnElements(navTogglers, "click", toggleNavbar);
+
+                const header = document.querySelector("[data-header]");
+                const backTopBtn = document.querySelector("[data-back-top-btn]");
+
+                let lastScrollPos = 0;
+
+                const hideHeader = () => {
+                const isScrollBottom = lastScrollPos < window.scrollY;
+                if (isScrollBottom) {
+                header.classList.add("hide");
+                } else {
+                header.classList.remove("hide");
+                }
+
+                lastScrollPos = window.scrollY;
+                }
+
+                window.addEventListener("scroll", () => {
+                if (window.scrollY >= 50) {
+                header.classList.add("active");
+                backTopBtn.classList.add("active");
+                hideHeader();
+                } else {
+                header.classList.remove("active");
+                backTopBtn.classList.remove("active");
+                }
+                });
+
+                const heroSlider = document.querySelector("[data-hero-slider]");
+                const heroSliderItems = document.querySelectorAll("[data-hero-slider-item]");
+                const heroSliderPrevBtn = document.querySelector("[data-prev-btn]");
+                const heroSliderNextBtn = document.querySelector("[data-next-btn]");
+
+                let currentSlidePos = 0;
+                let lastActiveSliderItem = heroSliderItems[0];
+
+                const updateSliderPos = function () {
+                lastActiveSliderItem.classList.remove("active");
+                heroSliderItems[currentSlidePos].classList.add("active");
+                lastActiveSliderItem = heroSliderItems[currentSlidePos];
+                }
+
+                const slideNext = function () {
+                if (currentSlidePos >= heroSliderItems.length - 1) {
+                currentSlidePos = 0;
+                } else {
+                currentSlidePos++;
+                }
+
+                updateSliderPos();
+                }
+
+                heroSliderNextBtn.addEventListener("click", slideNext);
+
+                const slidePrev = () => {
+                if (currentSlidePos <= 0) {
+                currentSlidePos = heroSliderItems.length - 1;
+                } else {
+                currentSlidePos--;
+                }
+
+                updateSliderPos();
+                }
+
+                heroSliderPrevBtn.addEventListener("click", slidePrev);
+
+                let autoSlideInterval;
+
+                const autoSlide = () => {
+                autoSlideInterval = setInterval(() => {
+                slideNext();
+                }, 7000);
+                }
+
+                addEventOnElements([heroSliderNextBtn, heroSliderPrevBtn], "mouseover", () => {
+                clearInterval(autoSlideInterval);
+                });
+
+                addEventOnElements([heroSliderNextBtn, heroSliderPrevBtn], "mouseout", autoSlide);
+
+                window.addEventListener("load", autoSlide);
+
+                const parallaxItems = document.querySelectorAll("[data-parallax-item]");
+
+                let x, y;
+
+                window.addEventListener("mousemove", (event) => {
+
+                x = (event.clientX / window.innerWidth * 10) - 5;
+                y = (event.clientY / window.innerHeight * 10) - 5;
+
+                x = x - (x * 2);
+                y = y - (y * 2);
+
+                for (let i = 0, len = parallaxItems.length; i < len; i++) {
+                x = x * Number(parallaxItems[i].dataset.parallaxSpeed);
+                y = y * Number(parallaxItems[i].dataset.parallaxSpeed);
+                parallaxItems[i].style.transform = `translate3d(${x}px, ${y}px, 0px)`;
+                }
+                });
+                </script>
+
+            <script type = "module" src = "https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+            <script nomodule src = "https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+            <% if (success) { %>
+                <script>
+                    alert("<%= success %>");
+                </script>
+            <% } %>
+                
+        </body>
+    </html>

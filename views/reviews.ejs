@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Reservia - Customer Reviews</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <%- include("includes/styles.ejs") %>
+  <%- include("includes/reviews.ejs") %>
+</head>
+<body>
+  <%- include("includes/header.ejs", { image: images }) %>
+
+  <div class="reviews-container">
+    <header class="reviews-header">
+      <h1>What Our Customers Say</h1>
+      <p class="subtitle">Real experiences from our valued guests</p>
+    </header>
+
+    <div class="reviews-grid">
+      <% reviews.forEach(review => { %>
+        <div class="review-card">
+          <div class="review-header">
+            <img src="https://api.dicebear.com/6.x/initials/svg?seed=<%= review.name %>" alt="<%= review.name %>" class="reviewer-avatar">
+            <div class="reviewer-info">
+              <h3><%= review.name %></h3>
+              <span class="review-date"><%= review.createdAt.toDateString() %></span>
+            </div>
+          </div>
+          <div class="review-rating">
+            <% for(let i = 0; i < review.rating; i++) { %>★<% } %>
+            <% for(let i = review.rating; i < 5; i++) { %>☆<% } %>
+          </div>
+          <div class="review-content">
+            <p><%= review.feedback %></p>
+          </div>
+          <div class="review-actions">
+            <form data-id="<%= review._id %>" class="like-form" style="display:inline;">
+              <button type="submit" class="like-btn">
+                <i class="fas fa-thumbs-up"></i> <%= review.likes %>
+              </button>
+            </form>
+
+            <button class="edit-btn" data-id="<%= review._id %>" data-name="<%= review.name %>" data-rating="<%= review.rating %>" data-feedback="<%= review.feedback %>">
+              <i class="fas fa-edit"></i> Edit
+            </button>
+
+            <form data-id="<%= review._id %>" class="delete-form" style="display:inline;">
+              <button type="submit" class="delete-btn">
+                <i class="fas fa-trash"></i> Delete
+              </button>
+            </form>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+
+    <div class="reviews-summary">
+      <div class="summary-stats">
+        <div class="stat">
+          <span class="number">4.8</span>
+          <span class="label">Average Rating</span>
+          <div class="stars">
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star-half-alt"></i>
+          </div>
+        </div>
+        <div class="stat">
+          <span class="number">2.5k+</span>
+          <span class="label">Happy Customers</span>
+        </div>
+        <div class="stat">
+          <span class="number">95%</span>
+          <span class="label">Satisfaction Rate</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="editModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <span id="closeModal" class="close">&times;</span>
+      <h2>Edit Review</h2>
+      <form id="editForm">
+        <input type="hidden" name="id" id="editId">
+        <label>Name:</label>
+        <input type="text" name="name" id="editName" required>
+
+        <label>Rating:</label>
+        <select name="rating" id="editRating">
+          <option value="1">★☆☆☆☆</option>
+          <option value="2">★★☆☆☆</option>
+          <option value="3">★★★☆☆</option>
+          <option value="4">★★★★☆</option>
+          <option value="5">★★★★★</option>
+        </select>
+
+        <label>Feedback:</label>
+        <textarea name="feedback" id="editFeedback" required></textarea>
+
+        <button type="submit">Update</button>
+      </form>
+    </div>
+  </div>
+
+  <%- include("includes/footer.ejs") %>
+</body>
+<script>
+  // LIKE
+  document.querySelectorAll('.like-form').forEach(form => {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = form.dataset.id;
+
+      const res = await fetch(`/reviews/${id}/like`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (res.ok) {
+        location.reload();
+      } else {
+        alert("Couldn't like the review!");
+      }
+    });
+  });
+
+  // DELETE
+  document.querySelectorAll('.delete-form').forEach(form => {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = form.dataset.id;
+
+      if (confirm("Are you sure you want to delete this review?")) {
+        const res = await fetch(`/reviews/${id}`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (res.ok) {
+          location.reload();
+        } else {
+          alert("Delete failed!");
+        }
+      }
+    });
+  });
+
+  // EDIT
+  document.querySelectorAll('.edit-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const modal = document.getElementById('editModal');
+      modal.style.display = 'flex';
+
+      document.getElementById('editId').value = btn.dataset.id;
+      document.getElementById('editName').value = btn.dataset.name;
+      document.getElementById('editRating').value = btn.dataset.rating;
+      document.getElementById('editFeedback').value = btn.dataset.feedback;
+    });
+  });
+
+  // CLOSE MODAL
+  document.getElementById('closeModal').addEventListener('click', () => {
+    document.getElementById('editModal').style.display = 'none';
+  });
+
+  // UPDATE REVIEW
+  document.getElementById('editForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const id = document.getElementById('editId').value;
+    const data = {
+      name: document.getElementById('editName').value,
+      rating: parseInt(document.getElementById('editRating').value),
+      feedback: document.getElementById('editFeedback').value
+    };
+
+    const res = await fetch(`/reviews/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    if (res.ok) {
+      location.reload();
+    } else {
+      alert('Failed to update review!');
+    }
+  });
+</script>
+
+</html>

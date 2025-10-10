@@ -1,0 +1,189 @@
+<style>
+        .explore-hero {
+                background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+                                url('https://images.unsplash.com/photo-1424847651672-bf20a4b0982b');
+                background-size: cover;
+                background-position: center;
+                padding: 120px 0 60px;
+                text-align: center;
+                margin-bottom: 60px;
+        }
+
+        .explore-hero .headline-1 {
+                color: var(--white);
+                margin-bottom: 30px;
+        }
+
+        .search-filters {
+                max-width: 800px;
+                margin: 0 auto;
+        }
+
+        .search-bar {
+                display: flex;
+                margin-bottom: 20px;
+        }
+
+        .search-input {
+                flex: 1;
+                padding: 15px 20px;
+                border: none;
+                border-radius: 5px 0 0 5px;
+                font-size: 16px;
+                background: rgba(255, 255, 255, 0.9);
+        }
+
+        .search-btn {
+        padding: 15px 25px;
+        background: var(--gold-crayola);
+        border: none;
+        border-radius: 0 5px 5px 0;
+        color: var(--black);
+        cursor: pointer;
+        transition: var(--transition-1);
+        }
+
+        .search-btn:hover {
+        background: var(--white);
+        }
+
+        .filter-options {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+        }
+
+        .filter-select {
+        padding: 10px 20px;
+        border: 1px solid var(--gold-crayola);
+        border-radius: 5px;
+        background: rgba(255, 255, 255, 0.9);
+        color: var(--black);
+        cursor: pointer;
+        width: auto;
+        }
+
+        .restaurant-grid {
+        padding: 60px 0;
+        }
+
+        .restaurant-card {
+        background: var(--smoky-black-1);
+        border-radius: 15px;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+        }
+
+        .restaurant-card:hover {
+        transform: translateY(-5px);
+        }
+
+        .card-banner {
+        position: relative;
+        height: 250px;
+        overflow: hidden;
+        }
+
+        .card-banner .badge {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: var(--gold-crayola);
+        color: var(--black);
+        padding: 5px 15px;
+        border-radius: 25px;
+        font-size: 14px;
+        font-weight: bold;
+        }
+
+        .card-content {
+        padding: 25px;
+        }
+
+        .restaurant-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 15px 0;
+        }
+
+        .rating {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        color: var(--gold-crayola);
+        }
+
+        .rating span {
+        color: var(--white);
+        margin-left: 5px;
+        }
+
+        .price {
+        color: var(--gold-crayola);
+        font-weight: bold;
+        }
+
+        .cuisine-type {
+        color: var(--quick-silver);
+        margin-bottom: 10px;
+        }
+
+        .location {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        color: var(--quick-silver);
+        font-size: 14px;
+        margin-bottom: 20px;
+        }
+
+        .card-footer {
+        margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+        .filter-options {
+                flex-direction: column;
+        }
+        
+        .filter-select {
+                width: 100%;
+        }
+        
+        .search-bar {
+                flex-direction: column;
+        }
+        
+        .search-input {
+                border-radius: 5px;
+                margin-bottom: 10px;
+        }
+        
+        .search-btn {
+                border-radius: 5px;
+        }
+        }
+
+        @media (min-width: 768px) {
+        .grid-list {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 30px;
+        }
+        }
+
+        @media (min-width: 1200px) {
+                .grid-list {
+                        grid-template-columns: repeat(3, 1fr);
+                }
+        }
+</style>
+<link rel = "shortcut icon" href ="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSU5zQzIc0nbzV04ns-mz3q7PwWJUYHLyHyQA&s" type = "image/x-icon">
+            
+<link href = "https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel = "stylesheet">
+<link href = "https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel = "stylesheet">
+
+<link rel = "preconnect" href = "https://fonts.googleapis.com">
+<link rel = "preconnect" href = "https://fonts.gstatic.com" crossorigin>
+<link href = "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&family=Forum&display=swap" rel = "stylesheet"> 

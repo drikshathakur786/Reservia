@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Thank You - Reservia</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    @keyframes popIn {
+      0% { transform: scale(0); opacity: 0; }
+      80% { transform: scale(1.1); opacity: 1; }
+      100% { transform: scale(1); }
+    }
+    .pop-in {
+      animation: popIn 0.5s ease-out forwards;
+    }
+
+    .tick-circle {
+      animation: tickDraw 1s ease forwards;
+      stroke-dasharray: 1000;
+      stroke-dashoffset: 1000;
+    }
+
+    @keyframes tickDraw {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-[#d4c29b] to-[#f5f5dc] text-[#4b3c2a] px-4">
+
+  <div class="text-center">
+    <!-- Tick Animation -->
+    <svg class="mx-auto mb-8 w-28 h-28" viewBox="0 0 100 100" fill="none">
+      <circle cx="50" cy="50" r="45" stroke="#8b5e3c" stroke-width="6" fill="none" />
+      <path class="tick-circle" d="M30 52 L45 67 L70 40" stroke="#8b5e3c" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+
+    <!-- Thank You Message -->
+    <h1 class="text-4xl font-extrabold mb-4 pop-in">Thank You for Your Payment!</h1>
+    <p class="text-lg mb-8 text-[#5c4732]">Your reservation has been confirmed. We look forward to serving you at Reservia.</p>
+
+    <!-- Back Button -->
+    <a href="/home" class="inline-block bg-[#8b5e3c] hover:bg-[#6e472e] text-white font-bold py-3 px-6 rounded-2xl transition duration-300">
+      Return to Home
+    </a>
+  </div>
+
+</body>
+</html>

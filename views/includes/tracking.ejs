@@ -1,0 +1,136 @@
+<script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.1.1/mapbox-gl.js"></script>
+<link href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.1.1/mapbox-gl.css" rel="stylesheet" />
+<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.4.1/mapbox-gl-geocoder.min.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.4.1/mapbox-gl-geocoder.css" rel="stylesheet" />
+<link rel="icon" href="https://img.icons8.com/ios-filled/50/tesla-model-s.png" type="image/x-icon">
+<style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        /* Fullscreen map */
+        #map {
+            margin-top:80px;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+            background-color: #ffffff;
+        }
+
+        /* Input container at the top */
+        .input-container {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        /* Geocoders' Input fields */
+        .geocoder {
+            width: 270px;
+            border: 2px solid #785715;
+            border-radius: 8px;
+            padding: 12px 15px;
+            font-size: 14px;
+            color: #333;
+            transition: border-color 0.3s ease;
+        }
+
+        .geocoder:focus {
+            border-color: #785715;
+            outline: none;
+        }
+
+        /* Button Styling */
+        button {
+            margin-left :40%;
+            padding: 12px 20px;
+            background-color: #785715;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.4s all ease-in-out;
+        }
+
+        button:hover {
+            background-color: #785715;
+        }
+
+        /* Info box styling */
+        .info {
+            position: absolute;
+            top: 180px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            font-size: 16px;
+            width: 300px;
+            text-align: center;
+            font-weight: 500;
+            color: #333;
+            border: 2px solid #785715;
+        }
+
+        .info p {
+            margin-bottom: 10px;
+        }
+
+        /* Car icon styling */
+        .car {
+            background-image: url("https://img.icons8.com/ios-filled/50/tesla-model-s.png");
+            background-size: contain;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Media queries for responsiveness */
+        @media (max-width: 600px) {
+            .input-container {
+                flex-direction: column;
+                max-width: 90%;
+                gap: 10px;
+            }
+
+            .geocoder {
+                width: 100%;
+            }
+
+            button {
+                width: 100%;
+                margin-top: 10px;
+            }
+
+            .info {
+                top: 120px;
+                width: 90%;
+            }
+        }
+    </style>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Locate and Route</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+<%-include("includes/tracking.ejs")%>
+<%-include("includes/styles.ejs")%>
+</head>
+
+<body>
+    <%-include("includes/header.ejs",{image:images})%>
+        <div id="map"></div>
+
+        <div class="input-container" style = "margin-top:100px;">
+            <div id="geocoder-from" class="geocoder"></div>
+            <div id="geocoder-to" class="geocoder"></div>
+            <button onclick="findRoute()" style ="background-color: #785715;">Find Route</button>
+        </div>
+
+        <div class="info" id="info" style = "margin-top:110px;" ></div>  
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1Ijoic2FsaW5hMDAiLCJhIjoiY2p5MDN2ZGE3MDlxeTNtbWsxYnB4MnF1YSJ9.bYThsWUyR_Na7MVQ9st_cg';
+
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v11',
+            center: [85.017, 30.457],
+            zoom: 5
+        });
+
+        let fromCoords = null;
+        let toCoords = null;
+
+        // Geocoder for "From"
+        const geocoderFrom = new MapboxGeocoder({
+            accessToken: mapboxgl.accessToken,
+            placeholder: 'Starting place',
+            mapboxgl: mapboxgl
+        });
+        document.getElementById('geocoder-from').appendChild(geocoderFrom.onAdd(map));
+
+        // Geocoder for "To"
+        const geocoderTo = new MapboxGeocoder({
+            accessToken: mapboxgl.accessToken,
+            placeholder: 'Destination',
+            mapboxgl: mapboxgl
+        });
+        document.getElementById('geocoder-to').appendChild(geocoderTo.onAdd(map));
+
+        geocoderFrom.on('result', (event) => {
+            fromCoords = event.result.center;
+        });
+
+        geocoderTo.on('result', (event) => {
+            toCoords = event.result.center;
+        });
+
+        let carMarker;
+        let routeCoords;
+        let currentStep = 0;
+
+        async function findRoute() {
+            if (!fromCoords || !toCoords) {
+                alert('Please select both starting place and destination.');
+                return;
+            }
+
+            try {
+                const directionsRequest = `https://api.mapbox.com/directions/v5/mapbox/driving/${fromCoords.join(",")};${toCoords.join(",")}?geometries=geojson&steps=true&access_token=${mapboxgl.accessToken}`;
+                const response = await fetch(directionsRequest);
+                const data = await response.json();
+
+                if (!data.routes || data.routes.length === 0) {
+                    throw new Error("No route found. Please check the inputs.");
+                }
+
+                routeCoords = data.routes[0].geometry.coordinates;
+                const distance = data.routes[0].distance;
+                const duration = data.routes[0].duration;
+
+                if (map.getSource('route')) {
+                    map.getSource('route').setData({
+                        type: 'Feature',
+                        geometry: {
+                            type: 'LineString',
+                            coordinates: routeCoords
+                        }
+                    });
+                } else {
+                    map.addLayer({
+                        id: 'route',
+                        type: 'line',
+                        source: {
+                            type: 'geojson',
+                            data: {
+                                type: 'Feature',
+                                geometry: {
+                                    type: 'LineString',
+                                    coordinates: routeCoords
+                                }
+                            }
+                        },
+                        layout: {
+                            'line-join': 'round',
+                            'line-cap': 'round'
+                        },
+                        paint: {
+                            'line-color': '#ff0000',
+                            'line-width': 4
+                        }
+                    });
+                }
+
+                const bounds = new mapboxgl.LngLatBounds();
+                routeCoords.forEach(coord => bounds.extend(coord));
+                map.fitBounds(bounds, { padding: 20 });
+
+                animateCar(routeCoords);
+
+                const distanceKm = (distance / 1000).toFixed(2);
+                const durationMin = (duration / 60).toFixed(2);
+                document.getElementById('info').innerHTML = `
+                    <p><strong>Distance:</strong> ${distanceKm} km</p>
+                    <p><strong>Duration:</strong> ${durationMin} mins</p>
+                `;
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+
+        function animateCar(route) {
+            if (carMarker) carMarker.remove();
+            const car = document.createElement('div');
+            car.className = 'car';
+            carMarker = new mapboxgl.Marker(car).setLngLat(route[0]).addTo(map);
+
+            currentStep = 0;
+            const speed = 10000;
+
+            function move() {
+                if (currentStep < route.length) {
+                    carMarker.setLngLat(route[currentStep]);
+                    currentStep++;
+                    setTimeout(move, speed);
+                }
+            }
+
+            move();
+        }
+    </script>
+</body>
+</html>

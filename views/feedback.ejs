@@ -1,0 +1,76 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Feedback Form</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <%-include("includes/feedback.ejs")%>
+  <%- include("includes/styles.ejs") %>
+</head>
+<body>
+  <%- include("includes/header.ejs") %>
+
+  <div class="feedback-container">
+    <h2><i class="fas fa-comment-dots"></i> We Value Your Feedback</h2>
+
+    <form action="/reviews/add" method="POST">
+      <input type="hidden" name="rating" id="ratingInput" value="0">
+
+      <div class="rating-group">
+        <div class="stars" id="stars">
+          <i class="fas fa-star" data-rating="1"></i>
+          <i class="fas fa-star" data-rating="2"></i>
+          <i class="fas fa-star" data-rating="3"></i>
+          <i class="fas fa-star" data-rating="4"></i>
+          <i class="fas fa-star" data-rating="5"></i>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <i class="fas fa-user"></i>
+        <input type="text" name="name" placeholder="Your Name" required>
+      </div>
+
+      <div class="input-group">
+        <i class="fas fa-envelope"></i>
+        <input type="email" name="email" placeholder="Your Email" required>
+      </div>
+
+      <div class="input-group">
+        <i class="fas fa-pen"></i>
+        <textarea name="feedback" placeholder="Write your feedback..." required></textarea>
+      </div>
+
+      <button class="submit-btn" type="submit">Submit Feedback</button>
+    </form>
+  </div>
+  <br><br>
+  <%- include("includes/footer.ejs") %>
+
+  <script>
+    const stars = document.querySelectorAll('#stars i');
+    const ratingInput = document.getElementById('ratingInput');
+
+    stars.forEach((star, idx) => {
+      star.addEventListener('mouseover', () => {
+        stars.forEach((s, i) => {
+          s.classList.toggle('hovered', i <= idx);
+        });
+      });
+
+      star.addEventListener('mouseout', () => {
+        stars.forEach(s => s.classList.remove('hovered'));
+      });
+
+      star.addEventListener('click', () => {
+        const selectedRating = star.getAttribute('data-rating');
+        ratingInput.value = selectedRating;
+        stars.forEach((s, i) => {
+          s.classList.toggle('selected', i < selectedRating);
+        });
+      });
+    });
+  </script>
+</body>
+</html>

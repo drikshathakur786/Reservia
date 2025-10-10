@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reservia - Luxury Dining Experience</title>
+  <%- include("includes/reservation.ejs") %>
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+  <link rel="icon" href="https://img.icons8.com/forma-bold-filled/24/restaurant-table.png" alt="restaurant-table" type="image/x-icon">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-brand">Reservia</div>
+    <div class="nav-links">
+      <a href="/home">Home</a>
+      <a href="/about">About</a>
+      <a href="/explore">Menu</a>
+      <a href="/reservation">Reserve</a>
+    </div>
+  </nav>
+
+  <div class="hero" id="home">
+    <div class="hero-content">
+      <h1 class="fade-in">Reservia</h1>
+      <p class="slide-up">Where Culinary Dreams Come True</p>
+      <a href="#reserve" class="cta-button">Book Your Table</a>
+    </div>
+  </div>
+
+  <section id="about" class="about-section" data-aos="fade-up">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-image">
+          <img src="<%= images[1] %>" alt="Restaurant interior">
+        </div>
+        <div class="about-content">
+          <h2>A Symphony of Flavors</h2>
+          <p>Experience dining at its finest in an atmosphere where every detail is crafted to perfection...</p>
+          <div class="features">
+            <div class="feature"><span class="feature-number">15</span><span class="feature-text">Master Chefs</span></div>
+            <div class="feature"><span class="feature-number">30</span><span class="feature-text">Signature Dishes</span></div>
+            <div class="feature"><span class="feature-number">4.9</span><span class="feature-text">Star Rating</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="ambiance" class="parallax-section">
+    <div class="overlay"></div>
+    <div class="parallax-content">
+      <h2>Immersive Dining Experience</h2>
+      <p>Where ambiance meets culinary excellence</p>
+    </div>
+  </section>
+
+  <section id="reserve" class="reservation-section" data-aos="fade-up">
+    <div class="container">
+      <form id="reservationForm" class="reservation-form" action="/reservation" method="POST">
+        <h2>Reserve Your Experience</h2>
+        <p class="form-subtitle">Let us prepare something special for you</p>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="name">Full Name</label>
+            <input type="text" id="name" name="name" required class="input-animate">
+            <div class="input-line"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required class="input-animate">
+            <div class="input-line"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="date">Date</label>
+            <input type="date" id="date" name="date" required class="input-animate">
+            <div class="input-line"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="time">Time</label>
+            <select id="time" name="time" required class="input-animate">
+              <option value="" disabled selected>Select time</option>
+              <option value="17:00">5:00 PM</option>
+              <option value="18:00">6:00 PM</option>
+              <option value="19:00">7:00 PM</option>
+              <option value="20:00">8:00 PM</option>
+              <option value="21:00">9:00 PM</option>
+              <option value="22:00">10:00 PM</option>
+            </select>
+            <div class="input-line"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="guests">Number of Guests</label>
+            <select id="guests" name="guests" required class="input-animate">
+              <option value="" disabled selected>Select guests</option>
+              <option value="1">1 Person</option>
+              <option value="2">2 People</option>
+              <option value="3">3 People</option>
+              <option value="4">4 People</option>
+              <option value="5">5 People</option>
+              <option value="6">6 People</option>
+            </select>
+            <div class="input-line"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="music">Ambiance Preference</label>
+            <select id="music" name="music" required class="input-animate">
+              <option value="" disabled selected>Select music</option>
+              <option value="jazz">Smooth Jazz</option>
+              <option value="classical">Classical Symphony</option>
+              <option value="acoustic">Acoustic Melodies</option>
+              <option value="ambient">Ambient Sounds</option>
+              <option value="none">No Preference</option>
+            </select>
+            <div class="input-line"></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="restaurant">Choose Your Restaurant</label>
+          <select id="restaurant" name="restaurant" required class="input-animate">
+            <option value="" disabled selected>Select a restaurant</option>
+            <option value="The Spice Symphony">The Spice Symphony</option>
+            <option value="Oceanic Bliss">Oceanic Bliss</option>
+            <option value="Skyline Grill">Skyline Grill</option>
+            <option value="Vintage Bites">Vintage Bites</option>
+          </select>
+          <div class="input-line"></div>
+        </div>
+
+        <div class="form-group full-width">
+          <label for="requests">Special Requests</label>
+          <textarea id="requests" name="requests" rows="3" class="input-animate"></textarea>
+          <div class="input-line"></div>
+        </div>
+
+        <button type="submit" class="submit-btn">
+          <span>Complete Reservation</span>
+          <div class="btn-animation"></div>
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <%- include("includes/footer.ejs", { image: images }) %>
+
+  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      AOS.init({ duration: 1000, once: true });
+
+      const navbar = document.querySelector('.navbar');
+      window.addEventListener('scroll', () => {
+        navbar.classList.toggle('scrolled', window.scrollY > 50);
+      });
+
+      const dateInput = document.getElementById('date');
+      dateInput.min = new Date().toISOString().split('T')[0];
+
+      const inputs = document.querySelectorAll('.input-animate');
+      inputs.forEach(input => {
+        input.addEventListener('focus', () => input.parentElement.classList.add('focused'));
+        input.addEventListener('blur', () => {
+          if (!input.value) input.parentElement.classList.remove('focused');
+        });
+      });
+
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute('href'));
+          const navHeight = document.querySelector('.navbar').offsetHeight;
+          const targetPosition = target.getBoundingClientRect().top + window.pageYOffset;
+          window.scrollTo({ top: targetPosition - navHeight, behavior: 'smooth' });
+        });
+      });
+    });
+  </script>
+</body>
+</html>

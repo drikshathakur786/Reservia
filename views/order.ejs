@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Orders - Reservia</title>
+    <%- include("includes/styles.ejs") %>
+    <%-include("includes/orders.ejs") %>
+</head>
+<body>
+    <%- include("includes/header.ejs") %>
+
+    <div class="logo-container">
+        <img src="<%= images[0] %>" alt="Reservia Logo" class="logo">
+    </div>
+
+    <div class="orders-grid">
+        <% if (orders && orders.length > 0) { %>
+            <% orders.forEach(order => { %>
+                <div class="order-container" data-booking-id="<%= order.orderId %>">
+                    <div class="order-header">
+                        <span class="order-id">#<%= String(order.orderId).slice(-5) %></span>
+                        <span class="order-status"><%= order.orderEmail %></span>
+                        <span class="order-date"><%= new Date(order.orderDate).toLocaleDateString() %></span>
+                    </div>
+                    <div class="order-details">
+                        <% if (order.items && order.items.length > 0) { %>
+                            <ul>
+                                <% order.items.forEach(item => { %>
+                                    <li class="order-item"><%= item.name %> x <%= item.quantity %></li>
+                                <% }); %>
+                            </ul>
+                        <% } else { %>
+                            <p>No items.</p>
+                        <% } %>
+                    </div>
+
+                    <div class="order-total-status">
+                        <strong>₹<%= order.totalAmount %></strong>
+                        <span><%= order.status %></span>
+                    </div>
+
+                    <div class="button-row">
+                        <button class="edit-reservation-btn">Edit</button>
+                        <button class="delete-reservation-btn" data-booking-id="<%= order.orderId %>">Delete</button>
+                        <form method="GET" action="/payment">
+                            <input type="hidden" name="orderId" value="<%= order.orderId %>">
+                            <button type="submit" class="pay-now-btn">Pay Now</button>
+                        </form>
+                    </div>
+
+                    <form class="edit-reservation-form" style="display: none;" data-booking-id="<%= order.orderId %>">
+                        <input type="text" name="name" placeholder="Name" value="<%= order.items[0].name.split(':')[1].split('@')[0].trim() %>" required>
+                        <input type="text" name="restaurant" placeholder="Restaurant" value="<%= order.items[0].name.split('@')[1].trim() %>" required>
+                        <input type="number" name="guests" placeholder="Guests" value="<%= order.items[1].quantity %>" required>
+                        <input type="time" name="time" value="<%= order.items[2].name.split(':')[1].trim() %>" required>
+                        <input type="text" name="music" placeholder="Ambiance" value="<%= order.items[3].name.split(':')[1].trim() %>">
+                        <input type="text" name="requests" placeholder="Special Requests" value="<%= order.items[4] ? order.items[4].name.split(':')[1].trim() : '' %>">
+                        <button type="submit">Update</button>
+                    </form>
+                </div>
+            <% }); %>
+        <% } else { %>
+            <p class="empty-message">No orders yet.</p>
+        <% } %>
+    </div>
+
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <script>
+        document.querySelectorAll(".delete-reservation-btn").forEach(button => {
+            button.addEventListener("click", async () => {
+                const bookingId = button.dataset.bookingId;
+                if (confirm("Are you sure you want to delete this reservation?")) {
+                    try {
+                        const res = await fetch(`/reservation/${bookingId}`, {
+                            method: "DELETE"
+                        });
+                        const data = await res.json();
+                        if (res.ok) {
+                            alert(data.message || "Reservation deleted!");
+                            location.reload();
+                        } else {
+                            alert(data.message || "Delete failed.");
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        alert("Error deleting reservation.");
+                    }
+                }
+            });
+        });
+
+        document.querySelectorAll(".edit-reservation-btn").forEach(button => {
+            button.addEventListener("click", () => {
+                const form = button.parentElement.nextElementSibling;
+                form.style.display = form.style.display === "none" ? "block" : "none";
+            });
+        });
+
+        document.querySelectorAll(".edit-reservation-form").forEach(form => {
+            form.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                const bookingId = form.dataset.bookingId;
+
+                const formData = new FormData(form);
+                const payload = {};
+                formData.forEach((value, key) => payload[key] = value);
+
+                try {
+                    const res = await fetch(`/reservation/${bookingId}`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(payload)
+                    });
+                    const data = await res.json();
+                    if (res.ok) {
+                        alert(data.message || "Updated successfully!");
+                        location.reload();
+                    } else {
+                        alert(data.message || "Update failed.");
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert("Something went wrong during update.");
+                }
+            });
+        });
+    </script>
+</body>
+</html>
