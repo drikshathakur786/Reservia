@@ -123,8 +123,16 @@ app.get('/explore', (req, res) => {
     ];
     res.render('explore', { images });
 });
+// Middleware to protect routes (Our Bouncer)
+const requireAuth = (req, res, next) => {
+    if (!req.session.userId) {
+        return res.redirect('/login');
+    }
+    next();
+};
+
 // Reservation GET (show form)
-app.get("/reservation", (req, res) => {
+app.get("/reservation", requireAuth, (req, res) => {
     const images = [
         'assets/images/HomePageImages/logo.png',
         'https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c'
@@ -133,9 +141,11 @@ app.get("/reservation", (req, res) => {
 });
 
 // Reservation POST (handle form)
-app.post("/reservation", async (req, res) => {
+app.post("/reservation", requireAuth, async (req, res) => {
     try {
-        const reservation = new Reservation(req.body);
+        // Fix: Attach the logged-in user's ID to the reservation
+        const reservationData = { ...req.body, userId: req.session.userId };
+        const reservation = new Reservation(reservationData);
         await reservation.save();
         res.redirect("/order");
     } catch (err) {
@@ -145,10 +155,11 @@ app.post("/reservation", async (req, res) => {
 });
 
 // Order (get reservations)
-app.get('/order', async (req, res) => {
+app.get('/order', requireAuth, async (req, res) => {
     const images = ['assets/images/HomePageImages/logo.png'];
     try {
-        const reservationData = await Reservation.find({});
+        // Fix: ONLY find reservations that belong to this specific user!
+        const reservationData = await Reservation.find({ userId: req.session.userId });
         const orders = reservationData.map(reservation => ({
             orderId: reservation._id,
             orderEmail: reservation.email,
@@ -171,9 +182,11 @@ app.get('/order', async (req, res) => {
 });
 
 // Reservation DELETE
-app.delete("/reservation/:id", async (req, res) => {
+app.delete("/reservation/:id", requireAuth, async (req, res) => {
     try {
-        await Reservation.findByIdAndDelete(req.params.id);
+        // Fix: Ensure the user deleting it actually owns it
+        const reservation = await Reservation.findOneAndDelete({ _id: req.params.id, userId: req.session.userId });
+        if (!reservation) return res.status(403).json({ message: "Unauthorized or not found." });
         res.json({ message: "Reservation deleted successfully." });
     } catch (err) {
         console.error("Delete error:", err);
@@ -182,9 +195,11 @@ app.delete("/reservation/:id", async (req, res) => {
 });
 
 // Reservation UPDATE
-app.put("/reservation/:id", async (req, res) => {
+app.put("/reservation/:id", requireAuth, async (req, res) => {
     try {
-        await Reservation.findByIdAndUpdate(req.params.id, req.body);
+        // Fix: Ensure the user updating it actually owns it
+        const reservation = await Reservation.findOneAndUpdate({ _id: req.params.id, userId: req.session.userId }, req.body);
+        if (!reservation) return res.status(403).json({ message: "Unauthorized or not found." });
         res.json({ message: "Reservation updated successfully." });
     } catch (err) {
         console.error("Update error:", err);
