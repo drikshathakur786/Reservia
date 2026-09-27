@@ -1,85 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Reservia - Create Your Account</title>
-        <%- include("includes/styles.ejs") %>
-        <%-include("includes/login.ejs")%>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-        <link rel="shortcut icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSU5zQzIc0nbzV04ns-mz3q7PwWJUYHLyHyQA&s" type="image/x-icon">
-    </head>
-    <body>
-        <%- include("includes/header.ejs") %>
-        <div class="container">
-            <div class="login-box">
-                <div class="decoration fork"></div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservia — Create Account</title>
+    <link rel="shortcut icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSU5zQzIc0nbzV04ns-mz3q7PwWJUYHLyHyQA&s" type="image/x-icon">
+    <%- include("includes/styles.ejs") %>
+    <%- include("includes/login.ejs") %>
+</head>
+<body>
+    <%- include("includes/header.ejs", { image: images }) %>
 
-                <div class="logo-container">
-                    <div class="logo">
-                        <span> R </span>
-                    </div>
-                </div>
+    <div class="auth-page">
+        <div class="auth-card">
 
-                <h1> Join Reservia </h1>
-                <p class="tagline"> Sign up to reserve your table effortlessly </p>
-
-                <form class="login-form" action="/sign-up" method="POST">
-                    <div class="input-group">
-                        <label for="name"> Name </label>
-                        <i class="fas fa-user" style="color:brown"></i>
-                        <input type="text" id="name" name="name" required placeholder="Your Full Name">
-                    </div>
-
-                    <div class="input-group">
-                        <label for="email"> Email </label>
-                        <i class="fas fa-envelope" style="color:brown"></i>
-                        <input type="email" id="email" name="email" required placeholder="your@email.com">
-                    </div>
-
-                    <div class="input-group">
-                        <label for="password"> Password </label>
-                        <i class="fas fa-lock" style="color:brown"></i>
-                        <input type="password" id="password" name="password" required placeholder="••••••••">
-                    </div>
-
-                    <div class="input-group">
-                        <label for="confirm-password"> Confirm Password </label>
-                        <i class="fas fa-lock" style="color:brown"></i>
-                        <input type="password" id="confirm-password" name="confirm-password" required placeholder="••••••••">
-                    </div>
-
-                    <button type="submit" class="login-btn">  
-                        <i class="fas fa-user-plus"></i> CREATE ACCOUNT
-                    </button>
-
-                    <div class="social-login">
-                        <span> Or sign up with </span>
-                    </div>
-
-                    <div class="social-icons">
-                        <a href="#" class="github" title="Github">
-                            <i class="fab fa-github"></i>
-                        </a>
-                        <a href="#" class="google" title="Google">
-                            <i class="fab fa-google"></i>
-                        </a>
-                        <a href="#" class="facebook" title="Facebook">
-                            <i class="fab fa-facebook-f"></i>
-                        </a>
-                        <a href="#" class="twitter" title="Twitter">
-                            <i class="fab fa-twitter"></i>
-                        </a>
-                    </div>
-
-                    <p class="signup-link">
-                        Already have an account? <a href="/login"> Log in </a>
-                    </p>
-                </form>
+            <div class="auth-brand">
+                <div class="r-badge">R</div>
+                <h1>Join Reservia</h1>
+                <p>Your table awaits</p>
             </div>
+
+            <div class="auth-divider">
+                <span></span><div class="diamond"></div><span></span>
+            </div>
+
+            <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+                <div class="auth-error">⚠ <%= errors[0].msg %></div>
+            <% } %>
+
+            <form action="/sign-up" method="POST" id="signup-form">
+                <label class="auth-label">Full Name</label>
+                <input class="auth-input" type="text" name="name" required placeholder="Your full name" autocomplete="name">
+
+                <label class="auth-label">Email Address</label>
+                <input class="auth-input" type="email" name="email" required placeholder="your@email.com" autocomplete="email">
+
+                <label class="auth-label">Password</label>
+                <input class="auth-input" type="password" name="password" id="password" required placeholder="Min. 6 characters" autocomplete="new-password">
+
+                <label class="auth-label">Confirm Password</label>
+                <input class="auth-input" type="password" id="confirm-password" required placeholder="Repeat your password" autocomplete="new-password">
+
+                <div id="pw-error" class="auth-error" style="display:none;">⚠ Passwords do not match.</div>
+
+                <button type="submit" class="auth-btn"><span>Create Account</span></button>
+            </form>
+
+            <p class="auth-footer">
+                Already have an account? <a href="/login">Log in</a>
+            </p>
         </div>
+    </div>
 
-        <%- include("includes/footer.ejs") %>
+    <%- include("includes/footer.ejs") %>
 
-    </body>
+    <script>
+        // Client-side password match check
+        document.getElementById('signup-form').addEventListener('submit', function(e) {
+            const pw = document.getElementById('password').value;
+            const cpw = document.getElementById('confirm-password').value;
+            const err = document.getElementById('pw-error');
+            if (pw !== cpw) {
+                e.preventDefault();
+                err.style.display = 'flex';
+            } else {
+                err.style.display = 'none';
+            }
+        });
+
+        // Also handle JSON response from server for signup
+        document.getElementById('signup-form').addEventListener('submit', async function(e) {
+            // Only intercept if passwords matched (default form submit otherwise)
+        });
+    </script>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+</body>
 </html>

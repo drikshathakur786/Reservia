@@ -1,90 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title> Reservia - Your Table Awaits </title>
-        <%- include("includes/login.ejs") %>
-        <%- include("includes/styles.ejs") %>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-        <link rel="shortcut icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSU5zQzIc0nbzV04ns-mz3q7PwWJUYHLyHyQA&s" type="image/x-icon">
-    </head>
-    <body>
-        <%- include("includes/header.ejs", { image: images }) %>
-        
-        <div class="container">
-            <div class="login-box">
-                <div class="decoration fork"></div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservia — Login</title>
+    <link rel="shortcut icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSU5zQzIc0nbzV04ns-mz3q7PwWJUYHLyHyQA&s" type="image/x-icon">
+    <%- include("includes/styles.ejs") %>
+    <%- include("includes/login.ejs") %>
+</head>
+<body>
+    <%- include("includes/header.ejs", { image: images }) %>
 
-                <div class="logo-container">
-                    <div class="logo">
-                        <span> R </span>
-                    </div>
-                </div>
+    <div class="auth-page">
+        <div class="auth-card">
 
-                <h1> Welcome to Reservia </h1>
-                <p class="tagline"> Where Every Meal Tells a Story </p>
-
-                <!-- Direct POST form submission to backend -->
-                <form class="login-form" method="POST" action="/login">
-                    <div class="input-group">
-                        <label for="email"> Email </label>
-                        <i class="fa-solid fa-envelope" style="color: brown"></i> <!-- Brown -->
-                        <input type="email" id="email" name="username" required placeholder="your@email.com">
-                    </div>
-
-                    <div class="input-group">
-                        <label for="password"> Password </label>
-                        <i class="fas fa-lock" style="color: brown"></i>
-                        <input type="password" id="password" name="password" required placeholder="••••••••">
-                    </div>
-
-                    <div class="remember-forgot">
-                        <a href="#" class="forgot-password"> Forgot Password? </a>
-                    </div>
-
-                    <button type="submit" class="login-btn">
-                        <i class="fas fa-utensils"></i> LET'S DINE IN
-                    </button>
-                </form>
-
-                <div class="social-login">
-                    <span> Or continue with </span>
-                </div>
-
-                <div class="social-icons">
-                    <a href="#" class="github" title="github">
-                        <i class="fab fa-github"></i>
-                    </a>
-                    <a href="#" class="google" title="google"> 
-                        <i class="fab fa-google"></i>
-                    </a>
-                    <a href="#" class="facebook" title="facebook">
-                        <i class="fab fa-facebook-f"></i>
-                    </a>
-                    <a href="#" class="twitter" title="twitter">
-                        <i class="fab fa-twitter"></i>
-                    </a>
-                </div>
-
-                <p class="signup-link">
-                    <p id="firstTime" style="text-align: center;">
-                        First time foodie?
-                    </p>
-                    <a href="/sign-up" style="text-align: center; text-decoration: underline"> Create an account </a>
-                </p>
+            <div class="auth-brand">
+                <div class="r-badge">R</div>
+                <h1>Welcome Back</h1>
+                <p>Reserve. Relax. Rejoice.</p>
             </div>
+
+            <div class="auth-divider">
+                <span></span><div class="diamond"></div><span></span>
+            </div>
+
+            <% if (message) { %>
+                <div class="auth-error">⚠ <%= message %></div>
+            <% } %>
+
+            <form method="POST" action="/login">
+                <label class="auth-label">Email Address</label>
+                <input class="auth-input" type="email" name="username" required placeholder="your@email.com" autocomplete="email">
+
+                <label class="auth-label">Password</label>
+                <input class="auth-input" type="password" name="password" required placeholder="••••••••" autocomplete="current-password">
+
+                <button type="submit" class="auth-btn"><span>Enter Reservia</span></button>
+            </form>
+
+            <p class="auth-footer">
+                New here? <a href="/sign-up">Create an account</a>
+            </p>
         </div>
+    </div>
 
-        <%- include("includes/footer.ejs") %>
-
-        <!-- Display the alert if a message is passed from the backend -->
-        <% if (message) { %>
-            <script>
-                alert("<%= message %>");
-                window.location.href = "<%= redirect %>"; // Redirect to the desired page
-            </script>
-        <% } %>
-        
-    </body>
+    <%- include("includes/footer.ejs") %>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+</body>
 </html>
