@@ -1,76 +1,246 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Feedback Form</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <%-include("includes/feedback.ejs")%>
-  <%- include("includes/styles.ejs") %>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback — Reservia</title>
+    <link rel="shortcut icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSU5zQzIc0nbzV04ns-mz3q7PwWJUYHLyHyQA&s" type="image/x-icon">
+    <%- include("includes/styles.ejs") %>
+    <style>
+        .feedback-page {
+            min-height: 100vh;
+            background: #0d0d0d;
+            background-image: radial-gradient(ellipse at top left, rgba(166,123,91,0.1) 0%, transparent 60%);
+            padding: 140px 24px 100px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+        }
+
+        .feedback-card {
+            width: 100%;
+            max-width: 560px;
+            animation: fadeSlideUp 0.5s ease forwards;
+        }
+
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .feedback-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .feedback-header h1 {
+            font-family: 'Forum', cursive;
+            font-size: clamp(3rem, 5vw, 5rem);
+            font-weight: 400;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .feedback-header p {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.2rem;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.3);
+        }
+
+        .fb-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin: 16px 0 36px;
+        }
+
+        .fb-divider span { width: 60px; height: 1px; background: rgba(166,123,91,0.3); }
+        .fb-diamond { width: 6px; height: 6px; border: 1px solid hsl(42,48%,77%); transform: rotate(45deg); }
+
+        /* Star rating */
+        .star-row {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 36px;
+        }
+
+        .star-row i {
+            font-size: 2.8rem;
+            color: rgba(166,123,91,0.25);
+            cursor: pointer;
+            transition: color 0.2s, transform 0.15s;
+        }
+
+        .star-row i.hovered,
+        .star-row i.selected {
+            color: hsl(42,48%,77%);
+        }
+
+        .star-row i:hover { transform: scale(1.2); }
+
+        /* Inputs */
+        .fb-label {
+            display: block;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 8px;
+        }
+
+        .fb-input {
+            width: 100%;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(166,123,91,0.2);
+            border-radius: 2px;
+            padding: 14px 16px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.4rem;
+            color: #fff;
+            transition: border-color 0.3s;
+            margin-bottom: 24px;
+            box-sizing: border-box;
+        }
+
+        .fb-input::placeholder { color: rgba(255,255,255,0.18); }
+        .fb-input:focus { outline: none; border-color: hsl(42,48%,77%); box-shadow: 0 0 0 3px rgba(166,123,91,0.1); }
+
+        .fb-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .fb-submit {
+            width: 100%;
+            padding: 15px;
+            background: transparent;
+            border: 1px solid hsl(42,48%,77%);
+            color: hsl(42,48%,77%);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            cursor: pointer;
+            border-radius: 2px;
+            position: relative;
+            overflow: hidden;
+            transition: color 0.3s, transform 0.2s;
+            margin-top: 8px;
+        }
+
+        .fb-submit::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: hsl(42,48%,77%);
+            transition: left 0.3s;
+            z-index: 0;
+        }
+
+        .fb-submit span { position: relative; z-index: 1; }
+        .fb-submit:hover::before { left: 0; }
+        .fb-submit:hover { color: #1a1008; transform: translateY(-2px); }
+
+        .fb-footer-link {
+            text-align: center;
+            margin-top: 24px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.3rem;
+            color: rgba(255,255,255,0.35);
+        }
+
+        .fb-footer-link a {
+            color: hsl(42,48%,77%);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.3s;
+        }
+
+        .fb-footer-link a:hover { border-bottom-color: hsl(42,48%,77%); }
+
+        /* Font Awesome stars */
+        .fa-star { font-style: normal; }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
-  <%- include("includes/header.ejs") %>
+    <%- include("includes/header.ejs") %>
 
-  <div class="feedback-container">
-    <h2><i class="fas fa-comment-dots"></i> We Value Your Feedback</h2>
+    <div class="feedback-page">
+        <div class="feedback-card">
 
-    <form action="/reviews/add" method="POST">
-      <input type="hidden" name="rating" id="ratingInput" value="0">
+            <div class="feedback-header">
+                <h1>Share Your Experience</h1>
+                <p>We value every word</p>
+            </div>
 
-      <div class="rating-group">
-        <div class="stars" id="stars">
-          <i class="fas fa-star" data-rating="1"></i>
-          <i class="fas fa-star" data-rating="2"></i>
-          <i class="fas fa-star" data-rating="3"></i>
-          <i class="fas fa-star" data-rating="4"></i>
-          <i class="fas fa-star" data-rating="5"></i>
+            <div class="fb-divider">
+                <span></span><div class="fb-diamond"></div><span></span>
+            </div>
+
+            <form action="/reviews/add" method="POST">
+                <input type="hidden" name="rating" id="ratingInput" value="0">
+
+                <!-- Interactive star rating -->
+                <div class="star-row" id="stars">
+                    <i class="fas fa-star" data-rating="1"></i>
+                    <i class="fas fa-star" data-rating="2"></i>
+                    <i class="fas fa-star" data-rating="3"></i>
+                    <i class="fas fa-star" data-rating="4"></i>
+                    <i class="fas fa-star" data-rating="5"></i>
+                </div>
+
+                <label class="fb-label">Full Name</label>
+                <input class="fb-input" type="text" name="name" placeholder="Your name" required autocomplete="name">
+
+                <label class="fb-label">Email Address</label>
+                <input class="fb-input" type="email" name="email" placeholder="your@email.com" required autocomplete="email">
+
+                <label class="fb-label">Your Review</label>
+                <textarea class="fb-input fb-textarea" name="feedback" placeholder="Tell us about your dining experience..." required></textarea>
+
+                <button type="submit" class="fb-submit"><span>Submit Review</span></button>
+            </form>
+
+            <p class="fb-footer-link">
+                View all reviews → <a href="/reviews">Read Guest Reviews</a>
+            </p>
+
         </div>
-      </div>
+    </div>
 
-      <div class="input-group">
-        <i class="fas fa-user"></i>
-        <input type="text" name="name" placeholder="Your Name" required>
-      </div>
+    <%- include("includes/footer.ejs") %>
 
-      <div class="input-group">
-        <i class="fas fa-envelope"></i>
-        <input type="email" name="email" placeholder="Your Email" required>
-      </div>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <script>
+        const stars = document.querySelectorAll('#stars i');
+        const ratingInput = document.getElementById('ratingInput');
+        let selected = 0;
 
-      <div class="input-group">
-        <i class="fas fa-pen"></i>
-        <textarea name="feedback" placeholder="Write your feedback..." required></textarea>
-      </div>
-
-      <button class="submit-btn" type="submit">Submit Feedback</button>
-    </form>
-  </div>
-  <br><br>
-  <%- include("includes/footer.ejs") %>
-
-  <script>
-    const stars = document.querySelectorAll('#stars i');
-    const ratingInput = document.getElementById('ratingInput');
-
-    stars.forEach((star, idx) => {
-      star.addEventListener('mouseover', () => {
-        stars.forEach((s, i) => {
-          s.classList.toggle('hovered', i <= idx);
+        stars.forEach((star, idx) => {
+            star.addEventListener('mouseover', () => {
+                stars.forEach((s, i) => s.classList.toggle('hovered', i <= idx));
+            });
+            star.addEventListener('mouseout', () => {
+                stars.forEach((s, i) => {
+                    s.classList.remove('hovered');
+                    s.classList.toggle('selected', i < selected);
+                });
+            });
+            star.addEventListener('click', () => {
+                selected = idx + 1;
+                ratingInput.value = selected;
+                stars.forEach((s, i) => s.classList.toggle('selected', i < selected));
+            });
         });
-      });
-
-      star.addEventListener('mouseout', () => {
-        stars.forEach(s => s.classList.remove('hovered'));
-      });
-
-      star.addEventListener('click', () => {
-        const selectedRating = star.getAttribute('data-rating');
-        ratingInput.value = selectedRating;
-        stars.forEach((s, i) => {
-          s.classList.toggle('selected', i < selectedRating);
-        });
-      });
-    });
-  </script>
+    </script>
 </body>
 </html>

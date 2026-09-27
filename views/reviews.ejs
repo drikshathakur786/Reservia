@@ -1,195 +1,533 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Reservia - Customer Reviews</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reviews — Reservia</title>
+    <link rel="shortcut icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSU5zQzIc0nbzV04ns-mz3q7PwWJUYHLyHyQA&s" type="image/x-icon">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <%- include("includes/styles.ejs") %>
+    <style>
+        .reviews-page {
+            min-height: 100vh;
+            background: #0d0d0d;
+            padding: 140px 24px 100px;
+        }
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <%- include("includes/styles.ejs") %>
-  <%- include("includes/reviews.ejs") %>
+        .reviews-page-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .reviews-page-header h1 {
+            font-family: 'Forum', cursive;
+            font-size: clamp(3rem, 5vw, 5.5rem);
+            font-weight: 400;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .reviews-page-header p {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.2rem;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.3);
+            margin-bottom: 20px;
+        }
+
+        .rev-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .rev-divider span {
+            width: 60px;
+            height: 1px;
+            background: rgba(166,123,91,0.35);
+        }
+
+        .rev-diamond {
+            width: 6px;
+            height: 6px;
+            border: 1px solid hsl(42,48%,77%);
+            transform: rotate(45deg);
+        }
+
+        /* Stats bar */
+        .reviews-stats {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            flex-wrap: wrap;
+            margin-bottom: 60px;
+            padding: 30px;
+            border-top: 1px solid rgba(166,123,91,0.15);
+            border-bottom: 1px solid rgba(166,123,91,0.15);
+        }
+
+        .reviews-stats .stat {
+            text-align: center;
+        }
+
+        .reviews-stats .stat-number {
+            display: block;
+            font-family: 'Forum', cursive;
+            font-size: 4rem;
+            color: hsl(42,48%,77%);
+            line-height: 1;
+        }
+
+        .reviews-stats .stat-label {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: rgba(255,255,255,0.3);
+            margin-top: 6px;
+        }
+
+        /* Grid */
+        .reviews-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 28px;
+            max-width: 1200px;
+            margin: 0 auto 48px;
+        }
+
+        /* Card */
+        .review-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(166,123,91,0.15);
+            border-top: 2px solid hsl(42,48%,77%);
+            border-radius: 2px;
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .review-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .review-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .reviewer-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 1px solid rgba(166,123,91,0.3);
+            object-fit: cover;
+        }
+
+        .reviewer-info h3 {
+            font-family: 'Forum', cursive;
+            font-size: 1.9rem;
+            font-weight: 400;
+            color: #fff;
+            margin: 0 0 2px;
+        }
+
+        .review-date {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.3);
+        }
+
+        .review-rating {
+            font-size: 1.6rem;
+            color: hsl(42,48%,77%);
+            letter-spacing: 2px;
+        }
+
+        .review-content p {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.4rem;
+            color: rgba(255,255,255,0.6);
+            line-height: 1.7;
+            font-style: italic;
+        }
+
+        .review-actions {
+            display: flex;
+            gap: 10px;
+            padding-top: 14px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .like-btn, .edit-btn, .delete-btn {
+            padding: 7px 16px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            border-radius: 2px;
+            cursor: pointer;
+            border: 1px solid;
+            transition: all 0.25s;
+            background: transparent;
+        }
+
+        .like-btn {
+            border-color: rgba(166,123,91,0.35);
+            color: hsl(42,48%,77%);
+        }
+
+        .like-btn:hover { background: rgba(166,123,91,0.1); }
+
+        .edit-btn {
+            border-color: rgba(255,255,255,0.15);
+            color: rgba(255,255,255,0.5);
+        }
+
+        .edit-btn:hover { background: rgba(255,255,255,0.05); }
+
+        .delete-btn {
+            border-color: rgba(220,50,50,0.3);
+            color: #ff8080;
+        }
+
+        .delete-btn:hover { background: rgba(220,50,50,0.1); }
+
+        /* CTA */
+        .reviews-cta {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .reviews-cta a {
+            display: inline-block;
+            padding: 15px 50px;
+            border: 1px solid hsl(42,48%,77%);
+            color: hsl(42,48%,77%);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-decoration: none;
+            border-radius: 2px;
+            position: relative;
+            overflow: hidden;
+            transition: color 0.3s, transform 0.2s;
+        }
+
+        .reviews-cta a::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: hsl(42,48%,77%);
+            transition: left 0.3s;
+            z-index: 0;
+        }
+
+        .reviews-cta a span { position: relative; z-index: 1; }
+        .reviews-cta a:hover::before { left: 0; }
+        .reviews-cta a:hover { color: #1a1008; transform: translateY(-2px); }
+
+        /* Edit Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal-box {
+            background: #111;
+            border: 1px solid rgba(166,123,91,0.3);
+            border-top: 2px solid hsl(42,48%,77%);
+            padding: 36px;
+            width: 100%;
+            max-width: 480px;
+            border-radius: 2px;
+            animation: fadeSlideUp 0.3s ease;
+        }
+
+        @keyframes fadeSlideUp {
+            from { opacity:0; transform: translateY(20px); }
+            to   { opacity:1; transform: translateY(0); }
+        }
+
+        .modal-box h2 {
+            font-family: 'Forum', cursive;
+            font-size: 2.8rem;
+            color: #fff;
+            font-weight: 400;
+            margin-bottom: 24px;
+        }
+
+        .modal-box label {
+            display: block;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 8px;
+        }
+
+        .modal-box input,
+        .modal-box select,
+        .modal-box textarea {
+            width: 100%;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(166,123,91,0.2);
+            border-radius: 2px;
+            padding: 12px 14px;
+            color: #fff;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        .modal-box input:focus,
+        .modal-box select:focus,
+        .modal-box textarea:focus {
+            outline: none;
+            border-color: hsl(42,48%,77%);
+        }
+
+        .modal-box textarea { min-height: 100px; resize: vertical; }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .modal-submit-btn {
+            flex: 1;
+            padding: 12px;
+            background: hsl(42,48%,77%);
+            border: none;
+            color: #1a1008;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: background 0.25s;
+        }
+
+        .modal-submit-btn:hover { background: #c9a96e; }
+
+        .modal-close-btn {
+            padding: 12px 20px;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.15);
+            color: rgba(255,255,255,0.5);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.2rem;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: all 0.25s;
+        }
+
+        .modal-close-btn:hover {
+            border-color: rgba(220,50,50,0.4);
+            color: #ff8080;
+        }
+
+        /* Empty state */
+        .reviews-empty {
+            text-align: center;
+            padding: 60px 20px;
+            grid-column: 1 / -1;
+            font-family: 'Forum', cursive;
+            font-size: 2.4rem;
+            color: rgba(255,255,255,0.15);
+        }
+    </style>
 </head>
 <body>
-  <%- include("includes/header.ejs", { image: images }) %>
+    <%- include("includes/header.ejs", { image: images }) %>
 
-  <div class="reviews-container">
-    <header class="reviews-header">
-      <h1>What Our Customers Say</h1>
-      <p class="subtitle">Real experiences from our valued guests</p>
-    </header>
+    <div class="reviews-page">
 
-    <div class="reviews-grid">
-      <% reviews.forEach(review => { %>
-        <div class="review-card">
-          <div class="review-header">
-            <img src="https://api.dicebear.com/6.x/initials/svg?seed=<%= review.name %>" alt="<%= review.name %>" class="reviewer-avatar">
-            <div class="reviewer-info">
-              <h3><%= review.name %></h3>
-              <span class="review-date"><%= review.createdAt.toDateString() %></span>
+        <div class="reviews-page-header" data-aos="fade-up">
+            <h1>Guest Reviews</h1>
+            <p>Real experiences from our valued guests</p>
+            <div class="rev-divider">
+                <span></span><div class="rev-diamond"></div><span></span>
             </div>
-          </div>
-          <div class="review-rating">
-            <% for(let i = 0; i < review.rating; i++) { %>★<% } %>
-            <% for(let i = review.rating; i < 5; i++) { %>☆<% } %>
-          </div>
-          <div class="review-content">
-            <p><%= review.feedback %></p>
-          </div>
-          <div class="review-actions">
-            <form data-id="<%= review._id %>" class="like-form" style="display:inline;">
-              <button type="submit" class="like-btn">
-                <i class="fas fa-thumbs-up"></i> <%= review.likes %>
-              </button>
+        </div>
+
+        <div class="reviews-stats" data-aos="fade-up" data-aos-delay="100">
+            <div class="stat">
+                <span class="stat-number">4.8</span>
+                <span class="stat-label">Average Rating</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number">2.5k+</span>
+                <span class="stat-label">Happy Guests</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number">95%</span>
+                <span class="stat-label">Satisfaction Rate</span>
+            </div>
+        </div>
+
+        <div class="reviews-grid">
+            <% if (reviews && reviews.length > 0) { %>
+                <% reviews.forEach(review => { %>
+                    <div class="review-card" data-aos="fade-up">
+                        <div class="review-header">
+                            <img src="https://api.dicebear.com/6.x/initials/svg?seed=<%= review.name %>&backgroundColor=3d2b1f&fontFamily=Georgia" alt="<%= review.name %>" class="reviewer-avatar">
+                            <div class="reviewer-info">
+                                <h3><%= review.name %></h3>
+                                <span class="review-date"><%= new Date(review.timestamp || review.createdAt).toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' }) %></span>
+                            </div>
+                        </div>
+
+                        <div class="review-rating">
+                            <% for(let i = 0; i < review.rating; i++) { %>★<% } %>
+                            <% for(let i = review.rating; i < 5; i++) { %><span style="opacity:0.2">★</span><% } %>
+                        </div>
+
+                        <div class="review-content">
+                            <p>"<%= review.feedback %>"</p>
+                        </div>
+
+                        <div class="review-actions">
+                            <form data-id="<%= review._id %>" class="like-form" style="display:inline;">
+                                <button type="submit" class="like-btn">♥ <%= review.likes || 0 %></button>
+                            </form>
+                            <button class="edit-btn" data-id="<%= review._id %>" data-name="<%= review.name %>" data-rating="<%= review.rating %>" data-feedback="<%= review.feedback %>">Edit</button>
+                            <form data-id="<%= review._id %>" class="delete-form" style="display:inline;">
+                                <button type="submit" class="delete-btn">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <div class="reviews-empty">No reviews yet. Be the first!</div>
+            <% } %>
+        </div>
+
+        <div class="reviews-cta" data-aos="fade-up">
+            <a href="/feedback"><span>Share Your Experience</span></a>
+        </div>
+
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal-overlay">
+        <div class="modal-box">
+            <h2>Edit Review</h2>
+            <form id="editForm">
+                <input type="hidden" id="editId">
+
+                <label>Name</label>
+                <input type="text" id="editName" required>
+
+                <label>Rating</label>
+                <select id="editRating">
+                    <option value="1">★ — Poor</option>
+                    <option value="2">★★ — Fair</option>
+                    <option value="3">★★★ — Good</option>
+                    <option value="4">★★★★ — Great</option>
+                    <option value="5">★★★★★ — Excellent</option>
+                </select>
+
+                <label>Your Review</label>
+                <textarea id="editFeedback" required></textarea>
+
+                <div class="modal-actions">
+                    <button type="submit" class="modal-submit-btn">Update</button>
+                    <button type="button" class="modal-close-btn" id="closeModal">Cancel</button>
+                </div>
             </form>
-
-            <button class="edit-btn" data-id="<%= review._id %>" data-name="<%= review.name %>" data-rating="<%= review.rating %>" data-feedback="<%= review.feedback %>">
-              <i class="fas fa-edit"></i> Edit
-            </button>
-
-            <form data-id="<%= review._id %>" class="delete-form" style="display:inline;">
-              <button type="submit" class="delete-btn">
-                <i class="fas fa-trash"></i> Delete
-              </button>
-            </form>
-          </div>
         </div>
-      <% }) %>
     </div>
 
-    <div class="reviews-summary">
-      <div class="summary-stats">
-        <div class="stat">
-          <span class="number">4.8</span>
-          <span class="label">Average Rating</span>
-          <div class="stars">
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star-half-alt"></i>
-          </div>
-        </div>
-        <div class="stat">
-          <span class="number">2.5k+</span>
-          <span class="label">Happy Customers</span>
-        </div>
-        <div class="stat">
-          <span class="number">95%</span>
-          <span class="label">Satisfaction Rate</span>
-        </div>
-      </div>
-    </div>
-  </div>
+    <%- include("includes/footer.ejs") %>
 
-  <div id="editModal" class="modal" style="display:none;">
-    <div class="modal-content">
-      <span id="closeModal" class="close">&times;</span>
-      <h2>Edit Review</h2>
-      <form id="editForm">
-        <input type="hidden" name="id" id="editId">
-        <label>Name:</label>
-        <input type="text" name="name" id="editName" required>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <script>
+        AOS.init({ duration: 800, once: true });
 
-        <label>Rating:</label>
-        <select name="rating" id="editRating">
-          <option value="1">★☆☆☆☆</option>
-          <option value="2">★★☆☆☆</option>
-          <option value="3">★★★☆☆</option>
-          <option value="4">★★★★☆</option>
-          <option value="5">★★★★★</option>
-        </select>
-
-        <label>Feedback:</label>
-        <textarea name="feedback" id="editFeedback" required></textarea>
-
-        <button type="submit">Update</button>
-      </form>
-    </div>
-  </div>
-
-  <%- include("includes/footer.ejs") %>
-</body>
-<script>
-  // LIKE
-  document.querySelectorAll('.like-form').forEach(form => {
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const id = form.dataset.id;
-
-      const res = await fetch(`/reviews/${id}/like`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' }
-      });
-
-      if (res.ok) {
-        location.reload();
-      } else {
-        alert("Couldn't like the review!");
-      }
-    });
-  });
-
-  // DELETE
-  document.querySelectorAll('.delete-form').forEach(form => {
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const id = form.dataset.id;
-
-      if (confirm("Are you sure you want to delete this review?")) {
-        const res = await fetch(`/reviews/${id}`, {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' }
+        // Like
+        document.querySelectorAll('.like-form').forEach(form => {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const res = await fetch(`/reviews/${form.dataset.id}/like`, { method: 'PUT', headers: { 'Content-Type': 'application/json' } });
+                if (res.ok) location.reload();
+            });
         });
 
-        if (res.ok) {
-          location.reload();
-        } else {
-          alert("Delete failed!");
-        }
-      }
-    });
-  });
+        // Delete
+        document.querySelectorAll('.delete-form').forEach(form => {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (confirm("Delete this review?")) {
+                    const res = await fetch(`/reviews/${form.dataset.id}`, { method: 'DELETE' });
+                    if (res.ok) form.closest('.review-card').remove();
+                }
+            });
+        });
 
-  // EDIT
-  document.querySelectorAll('.edit-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const modal = document.getElementById('editModal');
-      modal.style.display = 'flex';
+        // Open edit modal
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.getElementById('editId').value = btn.dataset.id;
+                document.getElementById('editName').value = btn.dataset.name;
+                document.getElementById('editRating').value = btn.dataset.rating;
+                document.getElementById('editFeedback').value = btn.dataset.feedback;
+                document.getElementById('editModal').classList.add('active');
+            });
+        });
 
-      document.getElementById('editId').value = btn.dataset.id;
-      document.getElementById('editName').value = btn.dataset.name;
-      document.getElementById('editRating').value = btn.dataset.rating;
-      document.getElementById('editFeedback').value = btn.dataset.feedback;
-    });
-  });
+        // Close modal
+        document.getElementById('closeModal').addEventListener('click', () => {
+            document.getElementById('editModal').classList.remove('active');
+        });
+        document.getElementById('editModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('editModal')) {
+                document.getElementById('editModal').classList.remove('active');
+            }
+        });
 
-  // CLOSE MODAL
-  document.getElementById('closeModal').addEventListener('click', () => {
-    document.getElementById('editModal').style.display = 'none';
-  });
-
-  // UPDATE REVIEW
-  document.getElementById('editForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const id = document.getElementById('editId').value;
-    const data = {
-      name: document.getElementById('editName').value,
-      rating: parseInt(document.getElementById('editRating').value),
-      feedback: document.getElementById('editFeedback').value
-    };
-
-    const res = await fetch(`/reviews/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-
-    if (res.ok) {
-      location.reload();
-    } else {
-      alert('Failed to update review!');
-    }
-  });
-</script>
-
+        // Submit edit
+        document.getElementById('editForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('editId').value;
+            const data = {
+                name: document.getElementById('editName').value,
+                rating: parseInt(document.getElementById('editRating').value),
+                feedback: document.getElementById('editFeedback').value
+            };
+            const res = await fetch(`/reviews/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            if (res.ok) location.reload();
+        });
+    </script>
+</body>
 </html>
