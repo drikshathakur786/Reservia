@@ -4,6 +4,8 @@ const express = require("express");
 const path = require("path");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const session = require("express-session");
+const MongoStore = require("connect-mongo");
 const app = express();
 
 
@@ -37,6 +39,20 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Session config
+app.use(session({
+    secret: process.env.SESSION_SECRET || "reservia_secret_key",
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({ mongoUrl: process.env.MONGO_URL })
+}));
+
+// Make session data available to all EJS templates
+app.use((req, res, next) => {
+    res.locals.userId = req.session.userId || null;
+    next();
+});
 
 // Home route
 app.get(['/', '/home'], (req, res) => {
@@ -309,8 +325,8 @@ app.post("/sign-up", async (req, res) => {
             return res.json({ message: "Email already registered!", redirect: "/login" });
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = new User({ name, email, password: hashedPassword });
+        // Fix: Removed double hashing. The User model hashes it automatically!
+        const newUser = new User({ name, email, password });
         await newUser.save();
         res.json({ message: "Signup successful! Please log in.", redirect: "/login" });
     } catch (err) {
@@ -331,6 +347,9 @@ app.post("/login", async (req, res) => {
             });
         }
 
+        // Fix: Give the user a session "wristband"
+        req.session.userId = user._id;
+
         res.redirect("/home?success=Login successful!");
     } catch (err) {
         console.error(err);
@@ -340,6 +359,11 @@ app.post("/login", async (req, res) => {
             redirect: "/login"
         });
     }
+});
+
+app.get("/logout", (req, res) => {
+    req.session.destroy();
+    res.redirect("/home");
 });
 
 // Start server

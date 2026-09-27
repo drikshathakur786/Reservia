@@ -9,9 +9,15 @@
                         </button>
                         <ul class="navbar-list">
 
-                                <li class="navbar-item">
-                                        <a href="/login" class="navbar-link hover-underline">Login</a>
-                                </li>
+                                <% if (userId) { %>
+                                        <li class="navbar-item">
+                                                <a href="/logout" class="navbar-link hover-underline">Logout</a>
+                                        </li>
+                                <% } else { %>
+                                        <li class="navbar-item">
+                                                <a href="/login" class="navbar-link hover-underline">Login</a>
+                                        </li>
+                                <% } %>
 
                                 <li class="navbar-item">
                                         <a href="/explore" class="navbar-link hover-underline">Explore</a>
