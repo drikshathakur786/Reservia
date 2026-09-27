@@ -6,15 +6,19 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
+const { body, validationResult } = require("express-validator");
 const app = express();
 
+// Security: Set secure HTTP headers
+app.use(helmet({ contentSecurityPolicy: false }));
 
-// two 3rd party middlewares
-// logger
+// Logger
 const morgan = require('morgan');
 app.use(morgan('dev'));
 
-// to load web-pages faster
+// To load web-pages faster
 const compression = require('compression');
 app.use(compression());
 
@@ -30,8 +34,8 @@ mongoose.connect(process.env.MONGO_URL)
   })
   .catch((err) => {
     console.error("MongoDB connection failed:", err);
+    process.exit(1); // Stop server if DB fails
   });
-
 
 // App config
 app.set("view engine", "ejs");
@@ -45,6 +49,7 @@ app.use(session({
     secret: process.env.SESSION_SECRET || "reservia_secret_key",
     resave: false,
     saveUninitialized: false,
+    cookie: { maxAge: 1000 * 60 * 60 * 24 }, // Session lasts 24 hours
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL })
 }));
 
@@ -52,6 +57,13 @@ app.use(session({
 app.use((req, res, next) => {
     res.locals.userId = req.session.userId || null;
     next();
+});
+
+// Rate limiter: max 10 login/signup attempts per 15 mins per IP
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 10,
+    message: "Too many attempts from this IP. Please try again after 15 minutes."
 });
 
 // Home route
@@ -323,24 +335,31 @@ app.get("/tracking", (req, res) => {
 // Auth GET
 app.get("/login", (req, res) => {
     const images = ['assets/images/HomePageImages/logo.png'];
-    res.render("login", { images, message: undefined, redirect: undefined });
+    res.render("login", { images, message: undefined, errors: [] });
 });
 
 app.get("/sign-up", (req, res) => {
     const images = ['assets/images/HomePageImages/logo.png'];
-    res.render("signUp", { images });
+    res.render("signUp", { images, errors: [] });
 });
 
-// Auth POST
-app.post("/sign-up", async (req, res) => {
+// Auth POST — with rate limiter + input validation
+app.post("/sign-up", authLimiter, [
+    body("name").trim().notEmpty().withMessage("Name is required."),
+    body("email").isEmail().normalizeEmail().withMessage("Please enter a valid email."),
+    body("password").isLength({ min: 6 }).withMessage("Password must be at least 6 characters.")
+], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ message: errors.array()[0].msg });
+    }
+
     const { name, email, password } = req.body;
     try {
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.json({ message: "Email already registered!", redirect: "/login" });
         }
-
-        // Fix: Removed double hashing. The User model hashes it automatically!
         const newUser = new User({ name, email, password });
         await newUser.save();
         res.json({ message: "Signup successful! Please log in.", redirect: "/login" });
@@ -350,7 +369,19 @@ app.post("/sign-up", async (req, res) => {
     }
 });
 
-app.post("/login", async (req, res) => {
+app.post("/login", authLimiter, [
+    body("username").isEmail().normalizeEmail().withMessage("Please enter a valid email."),
+    body("password").notEmpty().withMessage("Password is required.")
+], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.render("login", {
+            images: ['assets/images/HomePageImages/logo.png'],
+            message: errors.array()[0].msg,
+            errors: errors.array()
+        });
+    }
+
     const { username, password } = req.body;
     try {
         const user = await User.findOne({ email: username });
@@ -358,20 +389,18 @@ app.post("/login", async (req, res) => {
             return res.render("login", {
                 images: ['assets/images/HomePageImages/logo.png'],
                 message: "Invalid email or password!",
-                redirect: "/login"
+                errors: []
             });
         }
-
-        // Fix: Give the user a session "wristband"
         req.session.userId = user._id;
-
+        req.session.userName = user.name;
         res.redirect("/home?success=Login successful!");
     } catch (err) {
         console.error(err);
         res.status(500).render("login", {
             images: ['assets/images/HomePageImages/logo.png'],
             message: "Something went wrong. Please try again later.",
-            redirect: "/login"
+            errors: []
         });
     }
 });
@@ -381,7 +410,16 @@ app.get("/logout", (req, res) => {
     res.redirect("/home");
 });
 
+// 404 handler — must be last
+app.use((req, res) => {
+    res.status(404).render("index", {
+        images: ['assets/images/HomePageImages/logo.png'],
+        success: null
+    });
+});
+
 // Start server
-app.listen(8080, () => {
-    console.log("Server running at http://localhost:8080/home");
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+    console.log(`Server running at http://localhost:${PORT}/home`);
 });
