@@ -1,54 +1,60 @@
-# ✦ Reservia | Fine Dining Management System
+```text
+  _____                              _       
+ |  __ \                            (_)      
+ | |__) |___  ___  ___ _ ____   _ _  _  __ _ 
+ |  _  // _ \/ __|/ _ \ '__\ \ / / | |/ _` |
+ | | \ \  __/\__ \  __/ |   \ V /| | | (_| |
+ |_|  \_\___||___/\___|_|    \_/ |_|_|\__,_|
+                                             
+```
 
-[![Live Demo](https://img.shields.io/badge/Live_Demo-View_Website-c8a97e?style=for-the-badge)](https://reservia-x130.onrender.com)
+[![Live Deployment](https://img.shields.io/badge/Status-LIVE_ON_RENDER-10B981?style=for-the-badge&logo=render)](https://reservia-x130.onrender.com)
 
-> **A production-grade, full-stack application bridging a luxury B2C customer experience with robust B2B backend management.**
+Most restaurant booking projects on GitHub are just glorified to-do lists. You fill out a form, it saves to a database, and that's it. 
 
-Built with a focus on **security, concurrency, and automated workflows**—going beyond the standard CRUD app to solve real-world business challenges.
+I built **Reservia** because I wanted to see what happens when you treat a simple booking system like a high-stakes production environment. 
+
+### The Engineering Challenges (And How I Solved Them)
+
+If you're a recruiter or hiring manager looking at this code, here is what actually matters under the hood:
+
+**1. The "Double-Booking" Problem**
+What happens if a restaurant only has 20 tables, but 5 different users click "Book" at the exact same millisecond for the final table? 
+* **The Fix:** I implemented backend capacity locks using MongoDB's `countDocuments` evaluated asynchronously before saving. If you're user #21, the server rejects the request. No race-condition overbookings.
+
+**2. The "Ghost Town" Problem**
+How does a restaurant know which tables are currently active vs. past reservations without manually clicking "done" 50 times a day?
+* **The Fix:** I wrote a server-side `node-cron` background job. Every hour, on the hour, the server wakes up, scans the database for expired time slots, and automatically transitions them from "Reserved" to "Completed". 
+
+**3. The "Troll" Problem**
+What stops a malicious bot (or a rival restaurant) from creating a script that books all your tables and bankrupts the business?
+* **The Fix:** Express rate-limiting at the network level, combined with a strict database rule: one account can only hold a maximum of 3 active reservations at any given time.
+
+**4. The "B2B" Problem**
+A restaurant app isn't just for hungry customers; it's for the restaurant owner. 
+* **The Fix:** Built-in Role-Based Access Control (RBAC). If your database role is `Admin`, the UI dynamically unlocks a hidden Command Center dashboard calculating real-time revenue and occupancy metrics. 
+
+### The Stack
+No massive bloated frameworks. Just clean, fast, server-rendered code.
+* **Brain:** Node.js & Express.js
+* **Memory:** MongoDB Atlas (Mongoose) + Connect-Mongo for HTTP-only sessions
+* **Face:** EJS, Vanilla JS, and a custom dark-luxury CSS design system
+* **Armor:** Helmet.js, Bcrypt, and Express-Rate-Limit
 
 ---
 
-## 🚀 The "Why" (For Recruiters & Hiring Managers)
-In today's competitive tech landscape, I wanted to build an application that proves I think like a **Production Engineer**. Reservia doesn't just take bookings; it actively prevents race-conditions during high traffic, defends against XSS/Bot attacks, and automates its own database maintenance without human intervention.
+### Spin it up locally
 
-## 💎 Key Engineering Features
-* **Concurrency Safeguards:** Strict backend capacity validation prevents overbooking even if multiple users try to reserve the final table at the exact same millisecond.
-* **Role-Based Access Control (RBAC):** Secure separation between `User` and `Admin` accounts. Features a protected B2B Command Center for administrators to track revenue, occupancy, and KPIs.
-* **Automated Cron Jobs:** Server-side background tasks automatically sweep the database every hour to update expired reservations, ensuring data hygiene.
-* **Enterprise Security:** Hardened with `express-rate-limit` (brute-force defense), `helmet` (HTTP headers), strict input validation, and XSS sanitization.
-* **Luxury UI/UX:** A custom-designed, fully responsive dark-theme interface with fluid animations, built from scratch to reflect high-end branding.
+```bash
+# 1. Grab the code
+git clone https://github.com/drikshathakur786/Reservia.git
 
-## 🛠 Tech Stack
-* **Backend:** Node.js, Express.js
-* **Database:** MongoDB Atlas (Mongoose) + Connect-Mongo for secure session storage
-* **Frontend:** EJS (Embedded JavaScript), Vanilla JS, Custom CSS3
-* **DevOps/Deployment:** Hosted on **Render** with automated GitHub CI/CD
+# 2. Install the gears
+cd Reservia && npm install
 
----
+# 3. Give it the keys
+# Create a .env file and add your MONGO_URL, SESSION_SECRET, and PORT=8080
 
-## 🏃‍♂️ Run it Locally
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/drikshathakur786/Reservia.git
-   cd Reservia
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Set up environment variables**
-   Create a `.env` file in the root directory and add:
-   ```env
-   MONGO_URL=your_mongodb_connection_string
-   SESSION_SECRET=your_secret_key
-   PORT=8080
-   ```
-
-4. **Start the server**
-   ```bash
-   npm start
-   ```
-   *Visit `http://localhost:8080` in your browser.*
+# 4. Ignite
+npm start
+```
