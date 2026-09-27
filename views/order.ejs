@@ -3,128 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Orders - Reservia</title>
+    <title>Your Orders — Reservia</title>
+    <link rel="shortcut icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSU5zQzIc0nbzV04ns-mz3q7PwWJUYHLyHyQA&s" type="image/x-icon">
     <%- include("includes/styles.ejs") %>
-    <%-include("includes/orders.ejs") %>
+    <%- include("includes/orders.ejs") %>
 </head>
 <body>
-    <%- include("includes/header.ejs") %>
+    <%- include("includes/header.ejs", { image: images }) %>
 
-    <div class="logo-container">
-        <img src="<%= images[0] %>" alt="Reservia Logo" class="logo">
-    </div>
+    <div class="orders-page">
 
-    <div class="orders-grid">
-        <% if (orders && orders.length > 0) { %>
-            <% orders.forEach(order => { %>
-                <div class="order-container" data-booking-id="<%= order.orderId %>">
-                    <div class="order-header">
-                        <span class="order-id">#<%= String(order.orderId).slice(-5) %></span>
-                        <span class="order-status"><%= order.orderEmail %></span>
-                        <span class="order-date"><%= new Date(order.orderDate).toLocaleDateString() %></span>
-                    </div>
-                    <div class="order-details">
-                        <% if (order.items && order.items.length > 0) { %>
+        <h1 class="orders-page-title">Your Reservations</h1>
+        <p class="orders-page-subtitle">Manage your bookings</p>
+        <div class="orders-divider">
+            <span></span><div class="dot"></div><span></span>
+        </div>
+
+        <div class="orders-grid">
+            <% if (orders && orders.length > 0) { %>
+                <% orders.forEach(order => { %>
+                    <div class="order-container" data-booking-id="<%= order.orderId %>">
+
+                        <div class="order-header">
+                            <span class="order-id">#<%= String(order.orderId).slice(-6).toUpperCase() %></span>
+                            <span class="order-status"><%= order.orderEmail %></span>
+                            <span class="order-date"><%= new Date(order.orderDate).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) %></span>
+                        </div>
+
+                        <div class="order-details">
                             <ul>
                                 <% order.items.forEach(item => { %>
-                                    <li class="order-item"><%= item.name %> x <%= item.quantity %></li>
+                                    <li class="order-item"><%= item.name %></li>
                                 <% }); %>
                             </ul>
-                        <% } else { %>
-                            <p>No items.</p>
-                        <% } %>
-                    </div>
+                        </div>
 
-                    <div class="order-total-status">
-                        <strong>₹<%= order.totalAmount %></strong>
-                        <span><%= order.status %></span>
-                    </div>
+                        <div class="order-total-status">
+                            <strong>₹<%= order.totalAmount %></strong>
+                            <span><%= order.status %></span>
+                        </div>
 
-                    <div class="button-row">
-                        <button class="edit-reservation-btn">Edit</button>
-                        <button class="delete-reservation-btn" data-booking-id="<%= order.orderId %>">Delete</button>
-                        <form method="GET" action="/payment">
-                            <input type="hidden" name="orderId" value="<%= order.orderId %>">
-                            <button type="submit" class="pay-now-btn">Pay Now</button>
+                        <div class="button-row">
+                            <button class="edit-reservation-btn">Edit</button>
+                            <button class="delete-reservation-btn" data-booking-id="<%= order.orderId %>">Cancel</button>
+                            <form method="GET" action="/payment" style="flex:1;">
+                                <input type="hidden" name="orderId" value="<%= order.orderId %>">
+                                <button type="submit" class="pay-now-btn" style="width:100%;">Pay Now</button>
+                            </form>
+                        </div>
+
+                        <form class="edit-reservation-form" style="display:none;" data-booking-id="<%= order.orderId %>">
+                            <input type="text" name="name" placeholder="Name" value="<%= order.items[0].name.split(':')[1]?.split('@')[0]?.trim() || '' %>" required>
+                            <input type="text" name="restaurant" placeholder="Restaurant" value="<%= order.items[0].name.split('@')[1]?.trim() || '' %>" required>
+                            <input type="number" name="guests" placeholder="Guests" value="<%= order.items[1].quantity %>" required min="1">
+                            <input type="time" name="time" value="<%= order.items[2].name.split('Time:')[1]?.trim() || '' %>" required>
+                            <input type="text" name="music" placeholder="Ambiance" value="<%= order.items[3].name.split('Ambiance:')[1]?.trim() || '' %>">
+                            <input type="text" name="requests" placeholder="Special Requests" value="<%= order.items[4] ? order.items[4].name.split('Special Request:')[1]?.trim() : '' %>">
+                            <button type="submit">Update Reservation</button>
                         </form>
-                    </div>
 
-                    <form class="edit-reservation-form" style="display: none;" data-booking-id="<%= order.orderId %>">
-                        <input type="text" name="name" placeholder="Name" value="<%= order.items[0].name.split(':')[1].split('@')[0].trim() %>" required>
-                        <input type="text" name="restaurant" placeholder="Restaurant" value="<%= order.items[0].name.split('@')[1].trim() %>" required>
-                        <input type="number" name="guests" placeholder="Guests" value="<%= order.items[1].quantity %>" required>
-                        <input type="time" name="time" value="<%= order.items[2].name.split(':')[1].trim() %>" required>
-                        <input type="text" name="music" placeholder="Ambiance" value="<%= order.items[3].name.split(':')[1].trim() %>">
-                        <input type="text" name="requests" placeholder="Special Requests" value="<%= order.items[4] ? order.items[4].name.split(':')[1].trim() : '' %>">
-                        <button type="submit">Update</button>
-                    </form>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <div class="empty-state">
+                    <p>No reservations yet</p>
+                    <a href="/reservation">Book Your First Table</a>
                 </div>
-            <% }); %>
-        <% } else { %>
-            <p class="empty-message">No orders yet.</p>
-        <% } %>
+            <% } %>
+        </div>
     </div>
+
+    <%- include("includes/footer.ejs") %>
 
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
     <script>
+        // Delete reservation
         document.querySelectorAll(".delete-reservation-btn").forEach(button => {
             button.addEventListener("click", async () => {
                 const bookingId = button.dataset.bookingId;
-                if (confirm("Are you sure you want to delete this reservation?")) {
+                if (confirm("Cancel this reservation?")) {
                     try {
-                        const res = await fetch(`/reservation/${bookingId}`, {
-                            method: "DELETE"
-                        });
+                        const res = await fetch(`/reservation/${bookingId}`, { method: "DELETE" });
                         const data = await res.json();
                         if (res.ok) {
-                            alert(data.message || "Reservation deleted!");
-                            location.reload();
+                            button.closest('.order-container').remove();
                         } else {
                             alert(data.message || "Delete failed.");
                         }
                     } catch (err) {
-                        console.error(err);
-                        alert("Error deleting reservation.");
+                        alert("Error cancelling reservation.");
                     }
                 }
             });
         });
 
+        // Toggle edit form
         document.querySelectorAll(".edit-reservation-btn").forEach(button => {
             button.addEventListener("click", () => {
-                const form = button.parentElement.nextElementSibling;
-                form.style.display = form.style.display === "none" ? "block" : "none";
+                const form = button.closest('.order-container').querySelector('.edit-reservation-form');
+                const isVisible = form.style.display === 'flex';
+                form.style.display = isVisible ? 'none' : 'flex';
+                button.textContent = isVisible ? 'Edit' : 'Close';
             });
         });
 
+        // Submit edit
         document.querySelectorAll(".edit-reservation-form").forEach(form => {
             form.addEventListener("submit", async (e) => {
                 e.preventDefault();
                 const bookingId = form.dataset.bookingId;
-
-                const formData = new FormData(form);
-                const payload = {};
-                formData.forEach((value, key) => payload[key] = value);
-
+                const payload = Object.fromEntries(new FormData(form));
                 try {
                     const res = await fetch(`/reservation/${bookingId}`, {
                         method: "PUT",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
+                        headers: { "Content-Type": "application/json" },
                         body: JSON.stringify(payload)
                     });
                     const data = await res.json();
                     if (res.ok) {
-                        alert(data.message || "Updated successfully!");
+                        alert("Reservation updated!");
                         location.reload();
                     } else {
                         alert(data.message || "Update failed.");
                     }
                 } catch (err) {
-                    console.error(err);
-                    alert("Something went wrong during update.");
+                    alert("Something went wrong.");
                 }
             });
         });
