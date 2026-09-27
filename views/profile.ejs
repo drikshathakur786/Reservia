@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile — Reservia</title>
+    <link rel="shortcut icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSU5zQzIc0nbzV04ns-mz3q7PwWJUYHLyHyQA&s" type="image/x-icon">
+    <%- include("includes/styles.ejs") %>
+    <style>
+        .profile-page {
+            min-height: 100vh;
+            background: #0d0d0d;
+            background-image: radial-gradient(ellipse at top left, rgba(166,123,91,0.1) 0%, transparent 60%);
+            padding: 140px 24px 100px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .profile-card {
+            width: 100%;
+            max-width: 560px;
+            animation: fadeSlideUp 0.5s ease forwards;
+        }
+
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .profile-avatar {
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+            border: 2px solid rgba(166,123,91,0.4);
+            margin: 0 auto 20px;
+            display: block;
+        }
+
+        .profile-header h1 {
+            font-family: 'Forum', cursive;
+            font-size: clamp(3rem, 5vw, 5rem);
+            font-weight: 400;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+
+        .profile-header p {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.3rem;
+            color: rgba(255,255,255,0.35);
+        }
+
+        .prof-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin: 24px 0 36px;
+        }
+        .prof-divider span { width: 60px; height: 1px; background: rgba(166,123,91,0.3); }
+        .prof-diamond { width: 6px; height: 6px; border: 1px solid hsl(42,48%,77%); transform: rotate(45deg); }
+
+        /* Stats */
+        .profile-stats {
+            display: flex;
+            justify-content: center;
+            gap: 48px;
+            margin-bottom: 48px;
+            padding: 28px;
+            border: 1px solid rgba(166,123,91,0.15);
+            border-radius: 2px;
+        }
+
+        .profile-stat {
+            text-align: center;
+        }
+
+        .profile-stat .stat-num {
+            display: block;
+            font-family: 'Forum', cursive;
+            font-size: 3.5rem;
+            color: hsl(42,48%,77%);
+            line-height: 1;
+        }
+
+        .profile-stat .stat-lbl {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: rgba(255,255,255,0.3);
+            margin-top: 4px;
+        }
+
+        /* Info rows */
+        .profile-info {
+            margin-bottom: 40px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .info-row .info-label {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: rgba(255,255,255,0.4);
+        }
+
+        .info-row .info-value {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.4rem;
+            color: rgba(255,255,255,0.8);
+        }
+
+        /* Change password */
+        .pw-section h2 {
+            font-family: 'Forum', cursive;
+            font-size: 2.4rem;
+            font-weight: 400;
+            color: #fff;
+            margin-bottom: 24px;
+        }
+
+        .pw-label {
+            display: block;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 8px;
+        }
+
+        .pw-input {
+            width: 100%;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(166,123,91,0.2);
+            border-radius: 2px;
+            padding: 14px 16px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.4rem;
+            color: #fff;
+            transition: border-color 0.3s;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        .pw-input::placeholder { color: rgba(255,255,255,0.18); }
+        .pw-input:focus { outline: none; border-color: hsl(42,48%,77%); }
+
+        .pw-btn {
+            width: 100%;
+            padding: 14px;
+            background: transparent;
+            border: 1px solid hsl(42,48%,77%);
+            color: hsl(42,48%,77%);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            cursor: pointer;
+            border-radius: 2px;
+            position: relative;
+            overflow: hidden;
+            transition: color 0.3s, transform 0.2s;
+            margin-bottom: 16px;
+        }
+
+        .pw-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: hsl(42,48%,77%);
+            transition: left 0.3s;
+            z-index: 0;
+        }
+
+        .pw-btn span { position: relative; z-index: 1; }
+        .pw-btn:hover::before { left: 0; }
+        .pw-btn:hover { color: #1a1008; transform: translateY(-1px); }
+
+        .logout-btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: transparent;
+            border: 1px solid rgba(220,50,50,0.35);
+            color: #ff8080;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            cursor: pointer;
+            border-radius: 2px;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.25s;
+            margin-top: 24px;
+        }
+
+        .logout-btn:hover {
+            background: rgba(220,50,50,0.1);
+        }
+
+        .pw-success, .pw-error {
+            padding: 12px 16px;
+            border-radius: 2px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .pw-success {
+            background: rgba(40,167,69,0.1);
+            border: 1px solid rgba(40,167,69,0.3);
+            color: #80ff80;
+        }
+
+        .pw-error {
+            background: rgba(220,50,50,0.1);
+            border: 1px solid rgba(220,50,50,0.3);
+            color: #ff8080;
+        }
+    </style>
+</head>
+<body>
+    <%- include("includes/header.ejs", { image: images }) %>
+
+    <div class="profile-page">
+        <div class="profile-card">
+
+            <div class="profile-header">
+                <img src="https://api.dicebear.com/6.x/initials/svg?seed=<%= user.name %>&backgroundColor=3d2b1f&fontFamily=Georgia" alt="<%= user.name %>" class="profile-avatar">
+                <h1><%= user.name %></h1>
+                <p><%= user.email %></p>
+            </div>
+
+            <div class="prof-divider">
+                <span></span><div class="prof-diamond"></div><span></span>
+            </div>
+
+            <div class="profile-stats">
+                <div class="profile-stat">
+                    <span class="stat-num"><%= reservationCount %></span>
+                    <span class="stat-lbl">Reservations</span>
+                </div>
+                <div class="profile-stat">
+                    <span class="stat-num"><%= reviewCount %></span>
+                    <span class="stat-lbl">Reviews</span>
+                </div>
+            </div>
+
+            <div class="profile-info">
+                <div class="info-row">
+                    <span class="info-label">Full Name</span>
+                    <span class="info-value"><%= user.name %></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Email</span>
+                    <span class="info-value"><%= user.email %></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Member Since</span>
+                    <span class="info-value"><%= new Date(user.createdAt || Date.now()).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }) %></span>
+                </div>
+            </div>
+
+            <div class="pw-section">
+                <h2>Change Password</h2>
+
+                <div class="pw-success" id="pw-success">✓ Password updated successfully!</div>
+                <div class="pw-error" id="pw-error"></div>
+
+                <form id="pw-form">
+                    <label class="pw-label">Current Password</label>
+                    <input class="pw-input" type="password" id="currentPw" required placeholder="••••••••">
+
+                    <label class="pw-label">New Password</label>
+                    <input class="pw-input" type="password" id="newPw" required placeholder="Min. 6 characters">
+
+                    <label class="pw-label">Confirm New Password</label>
+                    <input class="pw-input" type="password" id="confirmPw" required placeholder="••••••••">
+
+                    <button type="submit" class="pw-btn"><span>Update Password</span></button>
+                </form>
+
+                <a href="/logout" class="logout-btn">Logout</a>
+            </div>
+
+        </div>
+    </div>
+
+    <%- include("includes/footer.ejs") %>
+
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <script>
+        document.getElementById('pw-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const successEl = document.getElementById('pw-success');
+            const errorEl = document.getElementById('pw-error');
+            successEl.style.display = 'none';
+            errorEl.style.display = 'none';
+
+            const currentPw = document.getElementById('currentPw').value;
+            const newPw = document.getElementById('newPw').value;
+            const confirmPw = document.getElementById('confirmPw').value;
+
+            if (newPw.length < 6) {
+                errorEl.textContent = '⚠ New password must be at least 6 characters.';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            if (newPw !== confirmPw) {
+                errorEl.textContent = '⚠ New passwords do not match.';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            try {
+                const res = await fetch('/profile/password', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ currentPassword: currentPw, newPassword: newPw })
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    successEl.style.display = 'block';
+                    document.getElementById('pw-form').reset();
+                } else {
+                    errorEl.textContent = '⚠ ' + data.message;
+                    errorEl.style.display = 'block';
+                }
+            } catch (err) {
+                errorEl.textContent = '⚠ Something went wrong. Try again.';
+                errorEl.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

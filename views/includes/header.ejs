@@ -11,7 +11,7 @@
 
                                 <% if (userId) { %>
                                         <li class="navbar-item">
-                                                <a href="/logout" class="navbar-link hover-underline">Logout</a>
+                                                <a href="/profile" class="navbar-link hover-underline">My Profile</a>
                                         </li>
                                 <% } else { %>
                                         <li class="navbar-item">
@@ -20,33 +20,19 @@
                                 <% } %>
 
                                 <li class="navbar-item">
-                                        <a href="/explore" class="navbar-link hover-underline">Explore</a>
+                                        <a href="/explore" class="navbar-link hover-underline">Restaurants</a>
                                 </li>
-                                
+
                                 <li class="navbar-item">
                                         <a href="/reservation" class="navbar-link hover-underline">Reservations</a>
                                 </li>
-                                
+
+                                <% if (userId) { %>
                                 <li class="navbar-item">
-                                        <a href="/contact" class="navbar-link hover-underline">Contact Us</a>
+                                        <a href="/order" class="navbar-link hover-underline">My Orders</a>
                                 </li>
-                                
-                                <li class="navbar-item">
-                                        <a href="/about" class="navbar-link hover-underline">About Us</a>
-                                </li>
-                                
-                                <li class="navbar-item">
-                                        <a href="/order" class="navbar-link hover-underline">Orders</a>
-                                </li>
-                                
-                                <li class="navbar-item">
-                                        <a href="/tracking" class="navbar-link hover-underline">Order Tracking</a>
-                                </li>
-                                
-                                <li class="navbar-item">
-                                        <a href="/feedback" class="navbar-link hover-underline">Feedback</a>
-                                </li>
-                                
+                                <% } %>
+
                                 <li class="navbar-item">
                                         <a href="/reviews" class="navbar-link hover-underline">Reviews</a>
                                 </li>

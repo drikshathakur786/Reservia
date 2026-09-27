@@ -29,6 +29,12 @@
         <div class="res-container">
             <form id="reservationForm" class="res-form" action="/reservation" method="POST">
 
+                <% if (typeof error !== 'undefined' && error) { %>
+                <div style="background:rgba(220,50,50,0.1);border:1px solid rgba(220,50,50,0.35);color:#ff8080;padding:14px 18px;font-family:'DM Sans',sans-serif;font-size:1.4rem;margin-bottom:28px;border-radius:2px;">
+                    ⚠ <%= error %>
+                </div>
+                <% } %>
+
                 <div class="res-form-grid">
                     <div class="res-form-group">
                         <label class="res-label">Full Name</label>

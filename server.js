@@ -92,7 +92,7 @@ app.get(['/', '/home'], (req, res) => {
       "https://images.pexels.com/photos/225228/pexels-photo-225228.jpeg?auto=compress&cs=tinysrgb&w=600",
       "assets/images/HomePageImages/event-3.jpg"
   ];
-    const success = req.query.success;
+    const success = req.query.success ? String(req.query.success).substring(0, 100) : null;
     res.render('index', { images, success });
 });
 
@@ -149,17 +149,33 @@ app.get("/reservation", requireAuth, (req, res) => {
         'assets/images/HomePageImages/logo.png',
         'https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c'
     ];
-    res.render("reservation", { images });
+    res.render("reservation", { images, error: null });
 });
 
-// Reservation POST (handle form)
+// Reservation POST (handle form) — with concurrent booking protection
+const MAX_TABLES_PER_SLOT = 20; // max tables per restaurant per time slot
+
 app.post("/reservation", requireAuth, async (req, res) => {
+    const images = ['assets/images/HomePageImages/logo.png', 'https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c'];
     try {
-        // Fix: Attach the logged-in user's ID to the reservation
+        const { restaurant, date, time } = req.body;
+
+        // Concurrent booking check — count existing bookings for this slot
+        const existingCount = await Reservation.countDocuments({ restaurant, date, time });
+
+        if (existingCount >= MAX_TABLES_PER_SLOT) {
+            // Fully booked — return user to reservation form with an error
+            return res.render("reservation", {
+                images,
+                error: `Sorry! ${restaurant} is fully booked for ${time} on ${date}. Please choose a different time or date.`
+            });
+        }
+
+        // Slot available — save the reservation
         const reservationData = { ...req.body, userId: req.session.userId };
         const reservation = new Reservation(reservationData);
         await reservation.save();
-        res.redirect("/order");
+        res.redirect("/order?success=Reservation confirmed!");
     } catch (err) {
         console.error("Reservation error:", err);
         res.status(500).send("Failed to make reservation.");
@@ -328,8 +344,39 @@ app.get("/payment", (req, res) => {
 });
 
 app.get("/tracking", (req, res) => {
+    res.redirect("/order");
+});
+
+// Profile GET
+app.get("/profile", requireAuth, async (req, res) => {
     const images = ['assets/images/HomePageImages/logo.png'];
-    res.render("tracking", { images });
+    try {
+        const user = await User.findById(req.session.userId).select("-password");
+        const reservationCount = await Reservation.countDocuments({ userId: req.session.userId });
+        const reviewCount = await Review.countDocuments({ email: user.email });
+        res.render("profile", { images, user, reservationCount, reviewCount });
+    } catch (err) {
+        console.error("Profile error:", err);
+        res.redirect("/home");
+    }
+});
+
+// Profile — change password
+app.put("/profile/password", requireAuth, async (req, res) => {
+    const { currentPassword, newPassword } = req.body;
+    try {
+        const user = await User.findById(req.session.userId);
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!isMatch) {
+            return res.status(401).json({ message: "Current password is incorrect." });
+        }
+        user.password = newPassword; // model's pre-save hook will hash it
+        await user.save();
+        res.json({ success: true });
+    } catch (err) {
+        console.error("Password change error:", err);
+        res.status(500).json({ message: "Something went wrong." });
+    }
 });
 
 // Auth GET

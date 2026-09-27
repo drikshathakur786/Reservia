@@ -28,6 +28,13 @@
                 <div class = "circle"></div>
                 <p class = "text"> Reservia </p>
             </div>
+
+            <% if (success) { %>
+            <div id="toast-msg" style="position:fixed;bottom:32px;right:32px;z-index:99999;background:#1a1008;border:1px solid hsl(42,48%,77%);color:hsl(42,48%,77%);padding:16px 28px;font-family:'DM Sans',sans-serif;font-size:1.4rem;border-radius:2px;box-shadow:0 8px 30px rgba(0,0,0,0.5);"></div>
+            <style>@keyframes toastIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}</style>
+            <script>var _t=document.getElementById('toast-msg');_t.textContent=String(<%- JSON.stringify(success) %>);_t.style.animation='toastIn 0.4s ease';setTimeout(function(){_t.style.transition='opacity 0.5s';_t.style.opacity='0';setTimeout(function(){_t.remove()},500)},3500);</script>
+            <% } %>
+
             <%-include("includes/header.ejs",{image:images})%>
             <main>
                 <article>
