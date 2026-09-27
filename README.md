@@ -1,6 +1,6 @@
 # ✦ Reservia
 
-[![Live Demo](https://img.shields.io/badge/Live_Demo-View_Website-c8a97e?style=for-the-badge)](https://reservia-x130.onrender.com)
+[![Live Demo]](https://reservia-x130.onrender.com)
 
 A production-ready restaurant management platform designed to deliver a luxury booking experience for customers while providing a secure, automated command center for administrators. 
 
