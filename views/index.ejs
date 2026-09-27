@@ -12,13 +12,8 @@
 
             <link rel = "shortcut icon" href ="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSU5zQzIc0nbzV04ns-mz3q7PwWJUYHLyHyQA&s" type = "image/x-icon">
 
-            <link href = "https://fonts.googleapis.com/css2?family = Cinzel:wght@700&display = swap" rel = "stylesheet">
-            <link href = "https://fonts.googleapis.com/css2?family = Roboto:wght@500&display = swap" rel = "stylesheet">
-
-
-            <link rel = "preconnect" href = "https://fonts.googleapis.com">
-            <link rel = "preconnect" href = "https://fonts.gstatic.com" crossorigin>
-            <link href = "https://fonts.googleapis.com/css2?family = DM+Sans:wght@400;700&family = Forum&display = swap" rel = "stylesheet">
+            <!-- AOS Animation CSS -->
+            <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
             <%-include("includes/styles.ejs")%>
 
@@ -107,7 +102,7 @@
                     </section>
                 </article>
 
-                <section class = "section about text-center" aria-labelledby = "about-label" id = "about">
+                <section class = "section about text-center" aria-labelledby = "about-label" id = "about" data-aos="fade-up" data-aos-duration="1000">
                     <div class = "container">
                         <div class = "about-content">
                             <p class = "label-2 section-subtitle" id = "about-label"> Our Story </p>
@@ -142,7 +137,7 @@
                     </div>
                 </section>
 
-                <section class = "section menu" aria-label = "menu-label" id = "menu">
+                <section class = "section menu" aria-label = "menu-label" id = "menu" data-aos="fade-up" data-aos-duration="1000">
                     <div class = "container">
                         <p class = "section-subtitle text-center label-2"> Featured Experiences </p>
 
@@ -298,7 +293,7 @@
                     </div>
                 </section>
 
-                <section class = "reservation">
+                <section class = "reservation" data-aos="zoom-in" data-aos-duration="1000">
                     <div class = "container">
                         <div class = "form reservation-form bg-black-10">
                             <form action = "" class = "form-left">
@@ -394,7 +389,7 @@
                     </div>
                 </section>
 
-                <section class = "section features text-center" aria-label = "features">
+                <section class = "section features text-center" aria-label = "features" data-aos="fade-up" data-aos-duration="1000">
                     <div class = "container">
                         <p class = "section-subtitle label-2"> Why Choose Reservia </p>
 
@@ -452,7 +447,7 @@
                     </div>
                 </section>
 
-                <section class = "section event bg-black-10" aria-label = "event">
+                <section class = "section event bg-black-10" aria-label = "event" data-aos="fade-up" data-aos-duration="1000">
                     <div class = "container">
                         <p class = "section-subtitle label-2 text-center"> Latest Happenings </p>
 
@@ -533,7 +528,10 @@
                 <ion-icon name = "chevron-up" aria-hidden = "true"></ion-icon>
             </a>
 
+                <!-- AOS Animation JS -->
+                <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
                 <script>
+                AOS.init();
                 'use strict';
 
                 const preloader = document.querySelector("[data-preaload]");
