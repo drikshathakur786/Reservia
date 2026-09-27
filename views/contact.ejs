@@ -1,119 +1,191 @@
 <!DOCTYPE html>
-    <html lang = "en">
-        <head>
-            <meta charset = "UTF-8">
-            <meta http-equiv = "X-UA-Compatible" content = "IE = edge">
-            <meta name = "viewport" content = "width = device-width, initial-scale = 1.0">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us — Reservia</title>
+    <%- include("includes/styles.ejs") %>
+    <style>
+        .contact-page {
+            min-height: 100vh;
+            background: #0d0d0d;
+            background-image: radial-gradient(ellipse at center, rgba(166,123,91,0.15) 0%, transparent 70%);
+            padding: 180px 24px 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-            <title> Reservia | Contact Us </title>
+        .contact-wrapper {
+            max-width: 1100px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 60px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(166,123,91,0.2);
+            padding: 60px;
+            border-radius: 4px;
+            animation: fadeSlideUp 0.6s ease forwards;
+        }
 
-            <link rel="shortcut icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2L15.5 8.5L22 12L15.5 15.5L12 22L8.5 15.5L2 12L8.5 8.5L12 2Z" fill="%23c8a97e"/></svg>' type="image/svg+xml">">
-            <%-include("includes/contact.ejs", {image:  images})%>
-        </head>
-        <script type = "text/javascript"
-            src = "https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js">
-        </script>
+        @media(min-width: 992px) {
+            .contact-wrapper { grid-template-columns: 1fr 1fr; }
+        }
 
-        <script type = "text/javascript">
-            (function(){
-            emailjs.init("HVsFFnz7321Ldhl34");
-            })();
-        </script>
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
 
-        <body>
-                <%-include("includes/styles.ejs")%>
-                <%-include("includes/header.ejs", {image:images})%>
-         
-                <div class = "container">
-                    <button class = "nav-open-btn" aria-label = "open menu" data-nav-toggler>
-                        <span class = "line line-1"></span>
-                        <span class = "line line-2"></span>
-                        <span class = "line line-3"></span>
-                    </button>
+        .contact-info h1 {
+            font-family: 'Forum', cursive;
+            font-size: 4rem;
+            color: hsl(42, 48%, 77%);
+            margin-bottom: 20px;
+            line-height: 1;
+        }
 
-                    <div class = "overlay" data-nav-toggler data-overlay></div>
+        .contact-info p {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .info-item {
+            margin-bottom: 30px;
+        }
+
+        .info-item h3 {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: hsl(42, 48%, 77%);
+            margin-bottom: 8px;
+        }
+
+        .info-item p {
+            font-family: 'Forum', cursive;
+            font-size: 1.8rem;
+            color: #fff;
+            margin-bottom: 0;
+        }
+
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .c-input {
+            width: 100%;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(166,123,91,0.3);
+            padding: 16px 20px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.2rem;
+            color: #fff;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .c-input:focus {
+            outline: none;
+            border-color: hsl(42, 48%, 77%);
+            background: rgba(255,255,255,0.06);
+        }
+
+        textarea.c-input {
+            resize: none;
+            height: 150px;
+        }
+
+        .c-btn {
+            background: transparent;
+            border: 1px solid hsl(42, 48%, 77%);
+            color: hsl(42, 48%, 77%);
+            padding: 16px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .c-btn:hover {
+            background: hsl(42, 48%, 77%);
+            color: #1a1008;
+        }
+
+        #success-msg {
+            display: none;
+            background: rgba(40,167,69,0.15);
+            border: 1px solid rgba(74,222,128,0.3);
+            color: #4ade80;
+            padding: 16px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.1rem;
+            border-radius: 2px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <%- include("includes/header.ejs", { image: images }) %>
+
+    <div class="contact-page">
+        <div class="contact-wrapper">
+            <div class="contact-info">
+                <h1>Get in Touch</h1>
+                <p>Reach out to us for private dining inquiries, special events, or any other questions. Our concierge team is at your service.</p>
+                
+                <div class="info-item">
+                    <h3>Location</h3>
+                    <p>123 Culinary Avenue, Food City</p>
                 </div>
-            </header> 
-            <div class= "contact-us">            
-                <div class = "contact-container">
-                <div class = "contact-form">
-                    <h1 style = "color :rgba(61, 25, 25, 0.698);font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;"> Contact Us </h1>
-                    <p> Reach out to us for any queries, table bookings, or special arrangements. We’re here to make your dining experience unforgettable! </p>
-                    <form>
-                        <input type = "email" placeholder = "Enter a valid email address" id = "email" required>
-                        <input type = "text" placeholder = "Enter your Name" id = "name" required>
-                        <input type = "tel" placeholder = "Enter your phone number" required>
-                        <textarea placeholder = "Enter your message" id = "message" required></textarea>
-                        <button type = "submit" onclick = "sendMail()"> Submit </button>
-                    </form>
+                
+                <div class="info-item">
+                    <h3>Reservations</h3>
+                    <p>+91 98765 43210</p>
                 </div>
-                <div class = "contact-image">
-                    <img src = "<%=images[2]%>" alt = "Contact Us Image">
+
+                <div class="info-item">
+                    <h3>Email</h3>
+                    <p>concierge@reservia.com</p>
                 </div>
             </div>
+
+            <form class="contact-form" id="contactForm">
+                <div id="success-msg">✓ Your message has been sent to our concierge. We will reply shortly.</div>
+                
+                <input type="text" class="c-input" placeholder="Your Name" required>
+                <input type="email" class="c-input" placeholder="Your Email Address" required>
+                <input type="tel" class="c-input" placeholder="Phone Number" required>
+                <textarea class="c-input" placeholder="How can we help you?" required></textarea>
+                
+                <button type="submit" class="c-btn">Send Message</button>
+            </form>
         </div>
-        <br>
-        <%-include("includes/footer.ejs",{image: images})%>
-            <script>
-                        function sendMail() {
-                            document.querySelector('form').addEventListener('submit', function(event) {
-                                event.preventDefault();
+    </div>
 
-                let email = document.querySelector('input[type="email"]').value;
-                let name = document.querySelector('input[type="text"]').value;
-                let phone = document.querySelector('input[type="tel"]').value;
-                let date = document.querySelector('input[type="date"]').value;
-                let message = document.querySelector('textarea').value;
-
-                const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-                if (!emailPattern.test(email)) {
-                    alert("Please enter a valid email address.");
-                    return;
-                }
-
-                const namePattern = /^[a-zA-Z\s]+$/;
-                if (!namePattern.test(name)) {
-                    alert("Please enter a valid name. Only alphabets and spaces are allowed.");
-                    return;
-                }
-
-                const phonePattern = /^\d{10}$/;
-                if (!phonePattern.test(phone)) {
-                    alert("Please enter a valid 10-digit phone number. Only numbers are allowed.");
-                    return;
-                }
-
-                if (date === "") {
-                    alert("Please select a date.");
-                    return;
-                }
-
-                if (message.trim() === "") {
-                    alert("Please enter your message.");
-                    return;
-                }
-
-                alert("Form submitted successfully!");
-                this.reset();
-            });
-
-            var params = {
-                name: document.getElementById("name").value,
-                email: document.getElementById("email").value,
-                message: document.getElementById("message").value,
-            };
-
-            const serviceID = "service_3soxjtw";
-            const templateID = "template_u24qovp";
-
-            emailjs.send(serviceID, templateID, params).then(res => {
-                document.getElementById("name").value = "";
-                document.getElementById("email").value = "";
-                document.getElementById("message").value = "";
-                console.log(res);
-                alert("Your message sent successfully!!")
-            }).catch(err => console.log(err));
-        }
-            </script>
-        </body>
-    </html>
+    <%- include("includes/footer.ejs") %>
+    
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <script>
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            this.reset();
+            const msg = document.getElementById('success-msg');
+            msg.style.display = 'block';
+            setTimeout(() => { msg.style.display = 'none'; }, 5000);
+        });
+    </script>
+</body>
+</html>

@@ -47,54 +47,7 @@ cron.schedule('0 * * * *', async () => {
     }
 });
 
-// Middleware for Admin access
-const requireAdmin = async (req, res, next) => {
-    if (!req.session.userId) return res.redirect('/login');
-    const user = await User.findById(req.session.userId);
-    if (!user || user.role !== 'admin') {
-        return res.status(403).send("<h1>403 Forbidden: Admins Only</h1><a href='/home'>Go Home</a>");
-    }
-    next();
-};
 
-// Secret route to elevate current user to admin (for portfolio demonstration)
-app.get("/make-me-admin", async (req, res) => {
-    if (!req.session.userId) return res.redirect('/login');
-    await User.findByIdAndUpdate(req.session.userId, { role: 'admin' });
-    res.redirect("/admin");
-});
-
-// Admin Dashboard Route
-app.get("/admin", requireAdmin, async (req, res) => {
-    const images = ['assets/images/HomePageImages/logo.png'];
-    try {
-        const totalUsers = await User.countDocuments();
-        const totalReservations = await Reservation.countDocuments();
-        
-        // Calculate estimated revenue
-        const allRes = await Reservation.find();
-        let totalRevenue = 0;
-        allRes.forEach(r => {
-            totalRevenue += ((r.guests || 1) * 500); // 500 INR per guest
-        });
-
-        // Get recent bookings
-        const recentReservations = await Reservation.find()
-            .sort({ createdAt: -1 })
-            .limit(15);
-
-        res.render("admin", { 
-            images, 
-            totalUsers, 
-            totalReservations, 
-            totalRevenue,
-            recentReservations
-        });
-    } catch (err) {
-        console.error(err);
-        res.status(500).send("Admin Error");
-    }
-});
 
 
 // MongoDB connection
@@ -135,6 +88,81 @@ const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 10,
     message: "Too many attempts from this IP. Please try again after 15 minutes."
+});
+
+// Middleware for Admin access
+const requireAdmin = async (req, res, next) => {
+    if (!req.session.userId) return res.redirect('/login');
+    const user = await User.findById(req.session.userId);
+    if (!user || user.role !== 'admin') {
+        return res.status(403).send("<h1>403 Forbidden: Admins Only</h1><a href='/home'>Go Home</a>");
+    }
+    next();
+};
+
+// Secret route to elevate current user to admin (for portfolio demonstration)
+app.get("/make-me-admin", async (req, res) => {
+    if (!req.session.userId) {
+        return res.redirect('/login');
+    }
+    await User.findByIdAndUpdate(req.session.userId, { role: 'admin' });
+    req.session.role = 'admin'; // Fix: Force session update so navbar immediately shows Dashboard
+    req.session.save(() => {
+        res.redirect("/admin");
+    });
+});
+
+
+// Secret route to manually trigger the Cron Job for testing
+app.get("/test-cron", requireAdmin, async (req, res) => {
+    try {
+        const now = new Date();
+        const pastReservations = await Reservation.find({ status: 'Reserved' });
+        let updatedCount = 0;
+        for (let res of pastReservations) {
+            const resDate = new Date(`${res.date}T${res.time}`);
+            if (resDate < now) {
+                res.status = 'Completed';
+                await res.save();
+                updatedCount++;
+            }
+        }
+        res.send(`<h1>Cron Job Triggered Successfully!</h1><p>${updatedCount} past reservations were automatically marked as 'Completed'.</p><a href='/admin'>Go back to Dashboard</a>`);
+    } catch (err) {
+        res.status(500).send("Cron trigger failed");
+    }
+});
+
+// Admin Dashboard Route
+app.get("/admin", requireAdmin, async (req, res) => {
+    const images = ['assets/images/HomePageImages/logo.png'];
+    try {
+        const totalUsers = await User.countDocuments();
+        const totalReservations = await Reservation.countDocuments();
+        
+        // Calculate estimated revenue
+        const allRes = await Reservation.find();
+        let totalRevenue = 0;
+        allRes.forEach(r => {
+            totalRevenue += ((r.guests || 1) * 500); // 500 INR per guest
+        });
+
+        // Get recent bookings
+        const recentReservations = await Reservation.find()
+            .sort({ createdAt: -1 })
+            .limit(15);
+
+        res.render("admin", { 
+            images, 
+            totalUsers, 
+            totalReservations, 
+            totalRevenue,
+            recentReservations
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Admin Error");
+    }
 });
 
 // Home route

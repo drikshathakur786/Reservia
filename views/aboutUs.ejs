@@ -1,98 +1,209 @@
-<%-include("includes/about.ejs",{ images: images })%>
-<%-include("includes/header.ejs",{image : images})%>
-<div class="video-container">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us — Reservia</title>
+    <%- include("includes/styles.ejs") %>
+    <style>
+        .about-page {
+            background: #0d0d0d;
+            padding-top: 140px;
+            color: #fff;
+        }
 
-        <video autoplay muted loop>
-                <source src="<%=images[1]%>" type="video/mp4">
-                <source src="<%=images[2]%>" type="video/webm">
-                Your browser does not support the video tag.
-        </video>
+        .about-hero {
+            position: relative;
+            height: 60vh;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(166,123,91,0.2);
+        }
+
+        .about-hero video {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            min-width: 100%; min-height: 100%;
+            object-fit: cover;
+            opacity: 0.3;
+            z-index: 0;
+        }
+
+        .about-hero-content {
+            position: relative;
+            z-index: 1;
+            padding: 0 20px;
+        }
+
+        .about-hero-content h1 {
+            font-family: 'Forum', cursive;
+            font-size: clamp(3rem, 6vw, 6rem);
+            color: hsl(42, 48%, 77%);
+            margin-bottom: 10px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .about-hero-content p {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.2rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .story-section {
+            padding: 100px 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        @media(min-width: 992px) {
+            .story-section { grid-template-columns: 1fr 1fr; }
+        }
+
+        .story-text h2 {
+            font-family: 'Forum', cursive;
+            font-size: 3.5rem;
+            color: hsl(42, 48%, 77%);
+            margin-bottom: 30px;
+            line-height: 1.1;
+        }
+
+        .story-text p {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 20px;
+        }
+
+        .story-images {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .story-images img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 2px;
+            border: 1px solid rgba(166,123,91,0.2);
+        }
+
+        .img-tall {
+            grid-row: span 2;
+            height: 400px;
+        }
         
-        <div class="video-text">
-                <div class="header2">
-                        <h1>WELCOME TO RESERVIA</h1>
-                        <h2>Where Fine Dining Meets Elegance</h2>
-                 </div>
-        </div>
-        <div class="overlay"></div>
-</div>
-    
-<section class="container py-5">
-        <div class="row">
-                <div class="col-md-4 mb-4">
-                        <div class="card content-item">
-                                <img src="<%=images[3]%>" class="card-img-top" alt="Chef cooking in a professional kitchen">
-                                <div class="card-body">
-                                        <p class="card-text">Experience the finest culinary creations, crafted by our world-class chefs using the freshest ingredients.</p>
-                                </div>
-                        </div>
+        .img-short {
+            height: 190px;
+        }
+
+        .philosophy-section {
+            background: #111;
+            padding: 100px 24px;
+            text-align: center;
+            border-top: 1px solid rgba(166,123,91,0.1);
+            border-bottom: 1px solid rgba(166,123,91,0.1);
+        }
+
+        .philosophy-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .philosophy-section h2 {
+            font-family: 'Forum', cursive;
+            font-size: 3.5rem;
+            color: #fff;
+            margin-bottom: 60px;
+        }
+
+        .pillars {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 40px;
+        }
+
+        .pillar h3 {
+            font-family: 'Forum', cursive;
+            font-size: 2rem;
+            color: hsl(42, 48%, 77%);
+            margin-bottom: 15px;
+        }
+
+        .pillar p {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: rgba(255,255,255,0.5);
+        }
+    </style>
+</head>
+<body>
+    <%- include("includes/header.ejs", { image: images }) %>
+
+    <div class="about-page">
+        <section class="about-hero">
+            <video autoplay muted loop>
+                <source src="<%= images[1] %>" type="video/mp4">
+            </video>
+            <div class="about-hero-content">
+                <h1>Our Story</h1>
+                <p>Culinary Excellence Since 1998</p>
+            </div>
+        </section>
+
+        <section class="story-section">
+            <div class="story-text">
+                <h2>A Legacy of Fine Taste</h2>
+                <p>What began as a small, intimate gathering of culinary enthusiasts has blossomed into Reservia—a sanctuary for those who appreciate the finer things in life. Our founder believed that dining is not just about eating, but about the theater, the ambiance, and the memories forged around the table.</p>
+                <p>Today, our Michelin-trained chefs continue to push the boundaries of modern gastronomy while paying deep respect to classic techniques. Every ingredient is sourced with intention, every plate designed with passion.</p>
+            </div>
+            <div class="story-images">
+                <img src="<%= images[3] %>" class="img-tall" alt="Chef at work">
+                <div style="display:flex; flex-direction:column; gap:20px;">
+                    <img src="<%= images[4] %>" class="img-short" alt="Elegant dining">
+                    <img src="<%= images[5] %>" class="img-short" alt="Kitchen details">
                 </div>
-                <div class="col-md-4 mb-4">
-                        <div class="card content-item">
-                                <img src="<%=images[4]%>" class="card-img-top" alt="Elegant dining setup with wine glasses">
-                                <div class="card-body">
-                                        <p class="card-text">Enjoy a luxurious dining experience with beautifully set tables and a serene ambiance.</p>
-                                </div>
-                        </div>
+            </div>
+        </section>
+
+        <section class="philosophy-section">
+            <div class="philosophy-container">
+                <h2>Our Pillars</h2>
+                <div class="pillars">
+                    <div class="pillar">
+                        <h3>Mastery</h3>
+                        <p>We believe in the relentless pursuit of perfection. From the sourcing of truffles to the precise temperature of our wines.</p>
+                    </div>
+                    <div class="pillar">
+                        <h3>Elegance</h3>
+                        <p>Design and atmosphere are paramount. Our dining room is a carefully curated space meant to elevate every sense.</p>
+                    </div>
+                    <div class="pillar">
+                        <h3>Hospitality</h3>
+                        <p>True luxury is invisible. Our staff anticipates your needs before they arise, offering seamless, personalized service.</p>
+                    </div>
                 </div>
-                <div class="col-md-4 mb-4">
-                        <div class="card content-item">
-                                <img src="<%=images[5]%>" class="card-img-top" alt="Professional kitchen with chefs at work">
-                                <div class="card-body">
-                                        <p class="card-text">Our state-of-the-art kitchen ensures every dish is prepared to perfection with love and care.</p>
-                                </div>
-                        </div>
-                </div>
-        </div>
-</section>
+            </div>
+        </section>
+    </div>
 
-<section class="testimonials py-5">
-        <div class="container">
-                <h3 class="text-center mb-4">What Our Customers Say</h3>
+    <%- include("includes/footer.ejs") %>
 
-                        <div class="row">
-                                <div class="col-md-4">
-                                        <div class="card shadow-sm p-3 mb-4">
-                                        <blockquote class="blockquote mb-0">
-                                                <p>"The food was amazing, and the atmosphere was perfect for our anniversary!"</p>
-                                                <footer class="blockquote-footer">Sarah L.</footer>
-                                        </blockquote>
-                                        </div>
-                                </div>
-
-                                <div class="col-md-4">
-                                        <div class="card shadow-sm p-3 mb-4">
-                                                <blockquote class="blockquote mb-0">
-                                                        <p>"A truly unforgettable dining experience. The attention to detail is unmatched!"</p>
-                                                        <footer class="blockquote-footer">Michael R.</footer>
-                                                </blockquote>
-                                        </div>
-                                </div>
-
-                                <div class="col-md-4">
-                                        <div class="card shadow-sm p-3 mb-4">
-                                                <blockquote class="blockquote mb-0">
-                                                        <p>"From the food to the service, everything was top-notch. Highly recommend Reservia!"</p>
-                                                        <footer class="blockquote-footer">Emily T.</footer>
-                                                </blockquote>
-                                        </div>
-                                </div>
-                        </div>
-        </div>
-</section>
-
-<%-include("includes/footer.ejs",{image:images})%>
-
-    
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-        document.querySelectorAll('[data-nav-toggler]').forEach((toggler) => {
-                toggler.addEventListener('click', () => {
-                document.querySelector('[data-navbar]').classList.toggle('open');
-                document.querySelector('[data-overlay]').classList.toggle('active');
-                });
-        });
-</script>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 </body>
 </html>
