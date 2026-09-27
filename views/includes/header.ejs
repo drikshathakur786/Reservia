@@ -1,7 +1,7 @@
 <header class="header" data-header>
-        <div class="container">
-                <a href="/home" class="logo">
-                        <img src="<%=images[0]%>" width="160" height="50" alt="Reservia - Home">
+        <div class="container" style="display: flex; align-items: center; justify-content: space-between;">
+                <a href="/home" class="logo text-logo">
+                        RESERVIA
                 </a>
                 <nav class="navbar" data-navbar>
                         <button class="close-btn" aria-label="close menu" data-nav-toggler>
@@ -38,7 +38,7 @@
                                 </li>
                         </ul>
                 </nav>
-                 <a href="/reservation" class="btn btn-secondary">Book a Table</a>
+                 <a href="/reservation" class="header-book-btn">Book a Table</a>
                 <button class="nav-open-btn" aria-label="open menu" data-nav-toggler>
                         <span class="line line-1"></span>
                         <span class="line line-2"></span>
@@ -47,3 +47,39 @@
                 <div class="overlay" data-nav-toggler data-overlay></div>
         </div>
 </header>
+<style>
+.text-logo {
+    font-family: 'Forum', cursive;
+    font-size: 2.2rem;
+    color: hsl(42, 48%, 77%); /* gold-crayola */
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    text-decoration: none;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+}
+.header-book-btn {
+    border: 1px solid hsl(42, 48%, 77%);
+    color: hsl(42, 48%, 77%);
+    padding: 10px 24px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    text-decoration: none;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+    display: none; /* hidden by default on mobile */
+}
+.header-book-btn:hover {
+    background: hsl(42, 48%, 77%);
+    color: #1a1008;
+}
+@media (min-width: 992px) {
+    .header-book-btn {
+        display: inline-block;
+    }
+}
+</style>
