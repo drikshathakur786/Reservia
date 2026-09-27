@@ -10,6 +10,7 @@ const reservationSchema = new mongoose.Schema({
     guests: Number,
     music: String,
     requests: String,
+    status: { type: String, default: 'Reserved' }, // 'Reserved', 'Completed', 'Cancelled'
     createdAt: {
         type: Date,
         default: Date.now

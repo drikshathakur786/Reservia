@@ -9,6 +9,7 @@ const MongoStore = require("connect-mongo");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const { body, validationResult } = require("express-validator");
+const cron = require("node-cron");
 const app = express();
 
 // Security: Set secure HTTP headers
@@ -26,6 +27,75 @@ app.use(compression());
 const User = require("./models/login");
 const Reservation = require("./models/reservation");
 const Review = require("./models/review");
+
+// Background Task: Auto-complete past reservations every hour
+cron.schedule('0 * * * *', async () => {
+    console.log('Running cron job: Marking past reservations as Completed');
+    try {
+        const now = new Date();
+        const pastReservations = await Reservation.find({ status: 'Reserved' });
+        
+        for (let res of pastReservations) {
+            const resDate = new Date(`${res.date}T${res.time}`);
+            if (resDate < now) {
+                res.status = 'Completed';
+                await res.save();
+            }
+        }
+    } catch (err) {
+        console.error('Cron Error:', err);
+    }
+});
+
+// Middleware for Admin access
+const requireAdmin = async (req, res, next) => {
+    if (!req.session.userId) return res.redirect('/login');
+    const user = await User.findById(req.session.userId);
+    if (!user || user.role !== 'admin') {
+        return res.status(403).send("<h1>403 Forbidden: Admins Only</h1><a href='/home'>Go Home</a>");
+    }
+    next();
+};
+
+// Secret route to elevate current user to admin (for portfolio demonstration)
+app.get("/make-me-admin", async (req, res) => {
+    if (!req.session.userId) return res.redirect('/login');
+    await User.findByIdAndUpdate(req.session.userId, { role: 'admin' });
+    res.redirect("/admin");
+});
+
+// Admin Dashboard Route
+app.get("/admin", requireAdmin, async (req, res) => {
+    const images = ['assets/images/HomePageImages/logo.png'];
+    try {
+        const totalUsers = await User.countDocuments();
+        const totalReservations = await Reservation.countDocuments();
+        
+        // Calculate estimated revenue
+        const allRes = await Reservation.find();
+        let totalRevenue = 0;
+        allRes.forEach(r => {
+            totalRevenue += ((r.guests || 1) * 500); // 500 INR per guest
+        });
+
+        // Get recent bookings
+        const recentReservations = await Reservation.find()
+            .sort({ createdAt: -1 })
+            .limit(15);
+
+        res.render("admin", { 
+            images, 
+            totalUsers, 
+            totalReservations, 
+            totalRevenue,
+            recentReservations
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Admin Error");
+    }
+});
+
 
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URL)
@@ -56,6 +126,7 @@ app.use(session({
 // Make session data available to all EJS templates
 app.use((req, res, next) => {
     res.locals.userId = req.session.userId || null;
+    res.locals.userRole = req.session.role || null;
     next();
 });
 
@@ -158,20 +229,35 @@ const MAX_TABLES_PER_SLOT = 20; // max tables per restaurant per time slot
 app.post("/reservation", requireAuth, async (req, res) => {
     const images = ['assets/images/HomePageImages/logo.png', 'https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c'];
     try {
-        const { restaurant, date, time } = req.body;
+        const { restaurant, date, time, guests } = req.body;
+        
+        // 1. PRODUCTION CHECK: Prevent past dates (backend validation)
+        const selectedDate = new Date(date + 'T' + time);
+        if (selectedDate < new Date()) {
+            return res.render("reservation", { images, error: "Cannot book a table in the past." });
+        }
+        
+        // 2. PRODUCTION CHECK: Validate inputs
+        if (!restaurant || !date || !time || guests < 1) {
+            return res.render("reservation", { images, error: "Invalid booking details." });
+        }
 
-        // Concurrent booking check — count existing bookings for this slot
+        // 3. PRODUCTION CHECK: User Spam Prevention (max 3 active bookings per user)
+        const userBookings = await Reservation.countDocuments({ userId: req.session.userId, date: { $gte: new Date().toISOString().split('T')[0] } });
+        if (userBookings >= 3) {
+            return res.render("reservation", { images, error: "You cannot have more than 3 active reservations at a time." });
+        }
+
+        // 4. PRODUCTION CHECK: Concurrent Capacity Check
         const existingCount = await Reservation.countDocuments({ restaurant, date, time });
-
         if (existingCount >= MAX_TABLES_PER_SLOT) {
-            // Fully booked — return user to reservation form with an error
             return res.render("reservation", {
                 images,
-                error: `Sorry! ${restaurant} is fully booked for ${time} on ${date}. Please choose a different time or date.`
+                error: `Sorry! ${restaurant} is fully booked for ${time}. Please choose a different time or date.`
             });
         }
 
-        // Slot available — save the reservation
+        // 5. SUCCESS: Save reservation
         const reservationData = { ...req.body, userId: req.session.userId };
         const reservation = new Reservation(reservationData);
         await reservation.save();
@@ -441,6 +527,7 @@ app.post("/login", authLimiter, [
         }
         req.session.userId = user._id;
         req.session.userName = user.name;
+        req.session.role = user.role;
         res.redirect("/home?success=Login successful!");
     } catch (err) {
         console.error(err);

@@ -1,4 +1,12 @@
-<header class="header" data-header>
+import re
+
+with open('/Users/drikshathakur/Desktop/Reservia/views/includes/header.ejs', 'r') as f:
+    content = f.read()
+
+# We need to replace the old logo block and the old style block.
+# Let's just rewrite the whole header.ejs since we know exactly what it contains.
+
+new_header = """<header class="header" data-header>
         <div class="container" style="display: flex; align-items: center; justify-content: space-between;">
                 <a href="/home" class="logo creative-logo">
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -14,11 +22,6 @@
                                 <ion-icon name="close-outline" aria-hidden="true"></ion-icon>
                         </button>
                         <ul class="navbar-list">
-<% if (typeof userRole !== 'undefined' && userRole === 'admin') { %>
-                                        <li class="navbar-item">
-                                                <a href="/admin" class="navbar-link hover-underline" style="color: hsl(42, 48%, 77%);">Dashboard</a>
-                                        </li>
-                                <% } %>
 
                                 <% if (userId) { %>
                                         <li class="navbar-item">
@@ -113,4 +116,7 @@
         display: inline-block;
     }
 }
-</style>
+</style>"""
+
+with open('/Users/drikshathakur/Desktop/Reservia/views/includes/header.ejs', 'w') as f:
+    f.write(new_header)

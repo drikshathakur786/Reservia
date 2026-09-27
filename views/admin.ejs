@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard — Reservia</title>
+    <%- include("includes/styles.ejs") %>
+    <style>
+        .admin-page {
+            min-height: 100vh;
+            background: #0d0d0d;
+            background-image: radial-gradient(ellipse at top right, rgba(166,123,91,0.1) 0%, transparent 50%);
+            padding: 140px 24px 100px;
+            font-family: 'DM Sans', sans-serif;
+            color: #fff;
+        }
+
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 40px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 20px;
+        }
+
+        .admin-header h1 {
+            font-family: 'Forum', cursive;
+            font-size: 3.5rem;
+            color: hsl(42, 48%, 77%);
+            margin: 0;
+            line-height: 1;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 50px;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(166,123,91,0.2);
+            padding: 30px;
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: hsl(42, 48%, 77%);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 4px;
+            height: 100%;
+            background: hsl(42, 48%, 77%);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .stat-value {
+            font-family: 'Forum', cursive;
+            font-size: 3rem;
+            color: #fff;
+            line-height: 1;
+        }
+
+        .table-container {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 16px 24px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        th {
+            background: rgba(255,255,255,0.05);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: hsl(42, 48%, 77%);
+        }
+
+        td {
+            font-size: 1rem;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: bold;
+        }
+
+        .status-reserved {
+            background: rgba(40,167,69,0.15);
+            color: #4ade80;
+            border: 1px solid rgba(74,222,128,0.3);
+        }
+
+        .status-completed {
+            background: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.6);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+    </style>
+</head>
+<body>
+    <%- include("includes/header.ejs", { image: images }) %>
+
+    <div class="admin-page">
+        <div class="admin-container">
+            <div class="admin-header">
+                <div>
+                    <h1>Command Center</h1>
+                    <p style="color: rgba(255,255,255,0.5); margin-top: 10px;">Restaurant Management Dashboard</p>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-label">Total Revenue</span>
+                    <span class="stat-value">₹<%= totalRevenue.toLocaleString('en-IN') %></span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Total Bookings</span>
+                    <span class="stat-value"><%= totalReservations %></span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Registered Users</span>
+                    <span class="stat-value"><%= totalUsers %></span>
+                </div>
+            </div>
+
+            <h2 style="font-family: 'Forum', cursive; font-size: 2rem; margin-bottom: 20px; color: #fff;">Recent Reservations</h2>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Guest Name</th>
+                            <th>Restaurant</th>
+                            <th>Date & Time</th>
+                            <th>Party Size</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if(recentReservations.length > 0) { %>
+                            <% recentReservations.forEach(res => { %>
+                                <tr>
+                                    <td><%= res.name %></td>
+                                    <td><%= res.restaurant %></td>
+                                    <td><%= res.date %> @ <%= res.time %></td>
+                                    <td><%= res.guests %> Guests</td>
+                                    <td>
+                                        <span class="status-badge <%= res.status === 'Reserved' ? 'status-reserved' : 'status-completed' %>">
+                                            <%= res.status || 'Reserved' %>
+                                        </span>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 40px; color: rgba(255,255,255,0.4);">
+                                    No reservations found in the database.
+                                </td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <%- include("includes/footer.ejs") %>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+</body>
+</html>
