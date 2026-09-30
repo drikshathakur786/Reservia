@@ -27,6 +27,8 @@ app.use(compression());
 const User = require("./models/login");
 const Reservation = require("./models/reservation");
 const Review = require("./models/review");
+const SlotCounter = require("./models/slotCounter");
+
 
 // Background Task: Auto-complete past reservations every hour (disabled during test runs)
 if (process.env.NODE_ENV !== 'test') {
@@ -74,13 +76,20 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Session config
-app.use(session({
+const sessionConfig = {
     secret: process.env.SESSION_SECRET || "reservia_secret_key",
     resave: false,
     saveUninitialized: false,
     cookie: { maxAge: 1000 * 60 * 60 * 24 }, // Session lasts 24 hours
-    store: MongoStore.create({ mongoUrl: process.env.MONGO_URL })
-}));
+};
+
+// Only use MongoStore in production — tests use in-memory store (no MONGO_URL needed)
+if (process.env.NODE_ENV !== 'test') {
+    sessionConfig.store = MongoStore.create({ mongoUrl: process.env.MONGO_URL });
+}
+
+app.use(session(sessionConfig));
+
 
 // Make session data available to all EJS templates
 app.use((req, res, next) => {
@@ -297,74 +306,37 @@ app.post("/reservation", requireAuth, async (req, res) => {
             return res.status(400).render("reservation", { images, error: "You cannot have more than 3 active reservations at a time." });
         }
 
-        // 4. PRODUCTION CHECK: Concurrency-Safe Atomic Table Allocation Loop
-        let savedReservation = null;
-        let attempt = 0;
-        const maxRetries = 10;
+        // 4. PRODUCTION CHECK: Concurrency-Safe Atomic Slot Counter
+        const activeSlotLimit = process.env.MAX_TABLES_PER_SLOT ? parseInt(process.env.MAX_TABLES_PER_SLOT) : MAX_TABLES_PER_SLOT;
+        const slotKey = `${restaurant}::${date}::${time}`;
 
-        while (!savedReservation && attempt < maxRetries) {
-            attempt++;
+        // Atomically increment the counter for this slot
+        const counter = await SlotCounter.findOneAndUpdate(
+            { key: slotKey },
+            { $inc: { count: 1 } },
+            { new: true, upsert: true }
+        );
 
-            // Fetch currently assigned tables for active reservations in this slot
-            const activeReservations = await Reservation.find({
-                restaurant,
-                date,
-                time,
-                status: { $ne: 'Cancelled' }
-            }).select('tableNumber');
-
-            const activeSlotLimit = process.env.MAX_TABLES_PER_SLOT ? parseInt(process.env.MAX_TABLES_PER_SLOT) : MAX_TABLES_PER_SLOT;
-
-            if (activeReservations.length >= activeSlotLimit) {
-                return res.status(400).render("reservation", {
-                    images,
-                    error: `Sorry! ${restaurant} is fully booked for ${time}. Please choose a different time or date.`
-                });
-            }
-
-            const takenTables = new Set(activeReservations.map(r => r.tableNumber || 1));
-            let assignedTable = null;
-
-            for (let t = 1; t <= activeSlotLimit; t++) {
-                if (!takenTables.has(t)) {
-                    assignedTable = t;
-                    break;
-                }
-            }
-
-            if (!assignedTable) {
-                return res.status(400).render("reservation", {
-                    images,
-                    error: `Sorry! ${restaurant} is fully booked for ${time}. Please choose a different time or date.`
-                });
-            }
-
-            // Save reservation with unique index enforcement on (restaurant, date, time, tableNumber)
-            try {
-                const reservationData = { 
-                    ...req.body, 
-                    userId: req.session.userId,
-                    tableNumber: assignedTable,
-                    guests: Number(guests)
-                };
-                const reservation = new Reservation(reservationData);
-                savedReservation = await reservation.save();
-            } catch (saveErr) {
-                // E11000 duplicate key error means another request grabbed `assignedTable` simultaneously
-                if (saveErr.code === 11000) {
-                    // Retry loop re-evaluates active tables and grabs the next available slot
-                    continue;
-                }
-                throw saveErr;
-            }
-        }
-
-        if (!savedReservation) {
+        // If we exceeded the limit, revert the increment and reject
+        if (counter.count > activeSlotLimit) {
+            await SlotCounter.updateOne({ key: slotKey }, { $inc: { count: -1 } });
             return res.status(400).render("reservation", {
                 images,
-                error: `High server demand. Please try again.`
+                error: `Sorry! ${restaurant} is fully booked for ${time}. Please choose a different time or date.`
             });
         }
+
+        const assignedTable = counter.count;
+
+        // 5. Save the reservation
+        const reservationData = { 
+            ...req.body, 
+            userId: req.session.userId,
+            tableNumber: assignedTable,
+            guests: Number(guests)
+        };
+        const reservation = new Reservation(reservationData);
+        await reservation.save();
 
         return res.redirect("/order?success=Reservation confirmed!");
     } catch (err) {
