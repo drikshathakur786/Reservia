@@ -15,6 +15,10 @@ jobs:
       matrix:
         node-version: [18.x, 20.x]
 
+    env:
+      MONGOMS_VERSION: 7.0.14
+      MONGOMS_PREFER_GLOBAL_PATH: 0
+      MONGOMS_DOWNLOAD_DIR: /tmp/mongo-memory-server
 
     steps:
       - name: Checkout Code
@@ -25,6 +29,12 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
+
+      - name: Cache MongoDB Binary
+        uses: actions/cache@v4
+        with:
+          path: /tmp/mongo-memory-server
+          key: mongodb-binaries-7.0.14-${{ runner.os }}
 
       - name: Install Dependencies
         run: npm ci
