@@ -306,37 +306,73 @@ app.post("/reservation", requireAuth, async (req, res) => {
             return res.status(400).render("reservation", { images, error: "You cannot have more than 3 active reservations at a time." });
         }
 
-        // 4. PRODUCTION CHECK: Concurrency-Safe Atomic Slot Counter
+        // 4. PRODUCTION CHECK: Concurrency-Safe Atomic Table Allocation Loop
+        let savedReservation = null;
+        let attempt = 0;
+        const maxRetries = 10;
         const activeSlotLimit = process.env.MAX_TABLES_PER_SLOT ? parseInt(process.env.MAX_TABLES_PER_SLOT) : MAX_TABLES_PER_SLOT;
-        const slotKey = `${restaurant}::${date}::${time}`;
 
-        // Atomically increment the counter for this slot
-        const counter = await SlotCounter.findOneAndUpdate(
-            { key: slotKey },
-            { $inc: { count: 1 } },
-            { new: true, upsert: true }
-        );
+        while (!savedReservation && attempt < maxRetries) {
+            attempt++;
 
-        // If we exceeded the limit, revert the increment and reject
-        if (counter.count > activeSlotLimit) {
-            await SlotCounter.updateOne({ key: slotKey }, { $inc: { count: -1 } });
-            return res.status(400).render("reservation", {
-                images,
-                error: `Sorry! ${restaurant} is fully booked for ${time}. Please choose a different time or date.`
-            });
+            // Fetch currently assigned tables for active reservations in this slot
+            const activeReservations = await Reservation.find({
+                restaurant,
+                date,
+                time,
+                status: { $ne: 'Cancelled' }
+            }).select('tableNumber');
+
+            if (activeReservations.length >= activeSlotLimit) {
+                return res.status(400).render("reservation", {
+                    images,
+                    error: `Sorry! ${restaurant} is fully booked for ${time}. Please choose a different time or date.`
+                });
+            }
+
+            const takenTables = new Set(activeReservations.map(r => r.tableNumber || 1));
+            let assignedTable = null;
+
+            for (let t = 1; t <= activeSlotLimit; t++) {
+                if (!takenTables.has(t)) {
+                    assignedTable = t;
+                    break;
+                }
+            }
+
+            if (!assignedTable) {
+                return res.status(400).render("reservation", {
+                    images,
+                    error: `Sorry! ${restaurant} is fully booked for ${time}. Please choose a different time or date.`
+                });
+            }
+
+            // Save reservation with unique index enforcement on (restaurant, date, time, tableNumber)
+            try {
+                const reservationData = { 
+                    ...req.body, 
+                    userId: req.session.userId,
+                    tableNumber: assignedTable,
+                    guests: Number(guests)
+                };
+                const reservation = new Reservation(reservationData);
+                savedReservation = await reservation.save();
+            } catch (saveErr) {
+                // E11000 duplicate key error means another request grabbed `assignedTable` simultaneously
+                if (saveErr.code === 11000) {
+                    // Retry loop re-evaluates active tables and grabs the next available slot
+                    continue;
+                }
+                throw saveErr;
+            }
         }
 
-        const assignedTable = counter.count;
-
-        // 5. Save the reservation
-        const reservationData = { 
-            ...req.body, 
-            userId: req.session.userId,
-            tableNumber: assignedTable,
-            guests: Number(guests)
-        };
-        const reservation = new Reservation(reservationData);
-        await reservation.save();
+        if (!savedReservation) {
+            return res.status(400).render("reservation", {
+                images,
+                error: `High server demand. Please try again.`
+            });
+        }
 
         return res.redirect("/order?success=Reservation confirmed!");
     } catch (err) {

@@ -9,6 +9,10 @@ beforeAll(async () => {
     if (mongoose.connection.readyState === 0) {
         await mongoose.connect(global.__MONGO_SERVER__.getUri());
     }
+    
+    // CRITICAL: Ensure indexes are built in the in-memory DB before running tests!
+    const Reservation = require('../models/reservation');
+    await Reservation.syncIndexes();
 }, 30000);
 
 afterEach(async () => {

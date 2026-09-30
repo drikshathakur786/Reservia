@@ -21,7 +21,7 @@ const reservationSchema = new mongoose.Schema({
 // Compound Unique Index to prevent race conditions during concurrent bookings
 reservationSchema.index(
     { restaurant: 1, date: 1, time: 1, tableNumber: 1 },
-    { unique: true, partialFilterExpression: { status: { $ne: 'Cancelled' } } }
+    { unique: true, partialFilterExpression: { status: 'Reserved' } }
 );
 
 module.exports = mongoose.model('Reservation', reservationSchema);
