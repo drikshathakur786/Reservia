@@ -28,37 +28,43 @@ const User = require("./models/login");
 const Reservation = require("./models/reservation");
 const Review = require("./models/review");
 
-// Background Task: Auto-complete past reservations every hour
-cron.schedule('0 * * * *', async () => {
-    console.log('Running cron job: Marking past reservations as Completed');
-    try {
-        const now = new Date();
-        const pastReservations = await Reservation.find({ status: 'Reserved' });
-        
-        for (let res of pastReservations) {
-            const resDate = new Date(`${res.date}T${res.time}`);
-            if (resDate < now) {
-                res.status = 'Completed';
-                await res.save();
+// Background Task: Auto-complete past reservations every hour (disabled during test runs)
+if (process.env.NODE_ENV !== 'test') {
+    cron.schedule('0 * * * *', async () => {
+        console.log('Running cron job: Marking past reservations as Completed');
+        try {
+            const now = new Date();
+            const pastReservations = await Reservation.find({ status: 'Reserved' });
+            
+            for (let res of pastReservations) {
+                const resDate = new Date(`${res.date}T${res.time}`);
+                if (resDate < now) {
+                    res.status = 'Completed';
+                    await res.save();
+                }
             }
+        } catch (err) {
+            console.error('Cron Error:', err);
         }
-    } catch (err) {
-        console.error('Cron Error:', err);
-    }
-});
+    });
+}
+
 
 
 
 
 // MongoDB connection
-mongoose.connect(process.env.MONGO_URL)
-  .then(() => {
-    console.log("MongoDB connected");
-  })
-  .catch((err) => {
-    console.error("MongoDB connection failed:", err);
-    process.exit(1); // Stop server if DB fails
-  });
+if (process.env.NODE_ENV !== 'test') {
+    mongoose.connect(process.env.MONGO_URL)
+      .then(() => {
+        console.log("MongoDB connected");
+      })
+      .catch((err) => {
+        console.error("MongoDB connection failed:", err);
+        process.exit(1); // Stop server if DB fails
+      });
+}
+
 
 // App config
 app.set("view engine", "ejs");
@@ -83,12 +89,20 @@ app.use((req, res, next) => {
     next();
 });
 
-// Rate limiter: max 10 login/signup attempts per 15 mins per IP
-const authLimiter = rateLimit({
+// Rate limiter: max 10 login/signup attempts per 15 mins per IP (bypassed in test environment)
+const rateLimiterMiddleware = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 10,
     message: "Too many attempts from this IP. Please try again after 15 minutes."
 });
+
+const authLimiter = (req, res, next) => {
+    if (process.env.NODE_ENV === 'test') {
+        return next();
+    }
+    return rateLimiterMiddleware(req, res, next);
+};
+
 
 // Middleware for Admin access
 const requireAdmin = async (req, res, next) => {
@@ -251,8 +265,8 @@ app.get("/reservation", requireAuth, (req, res) => {
     res.render("reservation", { images, error: null });
 });
 
-// Reservation POST (handle form) — with concurrent booking protection
-const MAX_TABLES_PER_SLOT = 20; // max tables per restaurant per time slot
+// Reservation POST (handle form) — with atomic concurrent booking protection
+const MAX_TABLES_PER_SLOT = process.env.MAX_TABLES_PER_SLOT ? parseInt(process.env.MAX_TABLES_PER_SLOT) : 20;
 
 app.post("/reservation", requireAuth, async (req, res) => {
     const images = ['assets/images/HomePageImages/logo.png', 'https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c'];
@@ -261,40 +275,104 @@ app.post("/reservation", requireAuth, async (req, res) => {
         
         // 1. PRODUCTION CHECK: Prevent past dates (backend validation)
         const selectedDate = new Date(date + 'T' + time);
-        if (selectedDate < new Date()) {
-            return res.render("reservation", { images, error: "Cannot book a table in the past." });
+        const now = new Date();
+        // Allow same-day dates, but reject past timestamps
+        if (isNaN(selectedDate.getTime()) || selectedDate < new Date(now.getTime() - 60000)) {
+            return res.status(400).render("reservation", { images, error: "Cannot book a table in the past." });
         }
         
         // 2. PRODUCTION CHECK: Validate inputs
-        if (!restaurant || !date || !time || guests < 1) {
-            return res.render("reservation", { images, error: "Invalid booking details." });
+        if (!restaurant || !date || !time || !guests || Number(guests) < 1) {
+            return res.status(400).render("reservation", { images, error: "Invalid booking details." });
         }
 
         // 3. PRODUCTION CHECK: User Spam Prevention (max 3 active bookings per user)
-        const userBookings = await Reservation.countDocuments({ userId: req.session.userId, date: { $gte: new Date().toISOString().split('T')[0] } });
+        const todayStr = new Date().toISOString().split('T')[0];
+        const userBookings = await Reservation.countDocuments({ 
+            userId: req.session.userId, 
+            date: { $gte: todayStr },
+            status: { $ne: 'Cancelled' }
+        });
         if (userBookings >= 3) {
-            return res.render("reservation", { images, error: "You cannot have more than 3 active reservations at a time." });
+            return res.status(400).render("reservation", { images, error: "You cannot have more than 3 active reservations at a time." });
         }
 
-        // 4. PRODUCTION CHECK: Concurrent Capacity Check
-        const existingCount = await Reservation.countDocuments({ restaurant, date, time });
-        if (existingCount >= MAX_TABLES_PER_SLOT) {
-            return res.render("reservation", {
+        // 4. PRODUCTION CHECK: Concurrency-Safe Atomic Table Allocation Loop
+        let savedReservation = null;
+        let attempt = 0;
+        const maxRetries = 10;
+
+        while (!savedReservation && attempt < maxRetries) {
+            attempt++;
+
+            // Fetch currently assigned tables for active reservations in this slot
+            const activeReservations = await Reservation.find({
+                restaurant,
+                date,
+                time,
+                status: { $ne: 'Cancelled' }
+            }).select('tableNumber');
+
+            const activeSlotLimit = process.env.MAX_TABLES_PER_SLOT ? parseInt(process.env.MAX_TABLES_PER_SLOT) : MAX_TABLES_PER_SLOT;
+
+            if (activeReservations.length >= activeSlotLimit) {
+                return res.status(400).render("reservation", {
+                    images,
+                    error: `Sorry! ${restaurant} is fully booked for ${time}. Please choose a different time or date.`
+                });
+            }
+
+            const takenTables = new Set(activeReservations.map(r => r.tableNumber || 1));
+            let assignedTable = null;
+
+            for (let t = 1; t <= activeSlotLimit; t++) {
+                if (!takenTables.has(t)) {
+                    assignedTable = t;
+                    break;
+                }
+            }
+
+            if (!assignedTable) {
+                return res.status(400).render("reservation", {
+                    images,
+                    error: `Sorry! ${restaurant} is fully booked for ${time}. Please choose a different time or date.`
+                });
+            }
+
+            // Save reservation with unique index enforcement on (restaurant, date, time, tableNumber)
+            try {
+                const reservationData = { 
+                    ...req.body, 
+                    userId: req.session.userId,
+                    tableNumber: assignedTable,
+                    guests: Number(guests)
+                };
+                const reservation = new Reservation(reservationData);
+                savedReservation = await reservation.save();
+            } catch (saveErr) {
+                // E11000 duplicate key error means another request grabbed `assignedTable` simultaneously
+                if (saveErr.code === 11000) {
+                    // Retry loop re-evaluates active tables and grabs the next available slot
+                    continue;
+                }
+                throw saveErr;
+            }
+        }
+
+        if (!savedReservation) {
+            return res.status(400).render("reservation", {
                 images,
-                error: `Sorry! ${restaurant} is fully booked for ${time}. Please choose a different time or date.`
+                error: `High server demand. Please try again.`
             });
         }
 
-        // 5. SUCCESS: Save reservation
-        const reservationData = { ...req.body, userId: req.session.userId };
-        const reservation = new Reservation(reservationData);
-        await reservation.save();
-        res.redirect("/order?success=Reservation confirmed!");
+        return res.redirect("/order?success=Reservation confirmed!");
     } catch (err) {
         console.error("Reservation error:", err);
-        res.status(500).send("Failed to make reservation.");
+        return res.status(500).send("Failed to make reservation.");
     }
 });
+
 
 // Order (get reservations)
 app.get('/order', requireAuth, async (req, res) => {
@@ -581,7 +659,12 @@ app.use((req, res) => {
 });
 
 // Start server
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}/home`);
-});
+if (process.env.NODE_ENV !== 'test') {
+    const PORT = process.env.PORT || 8080;
+    app.listen(PORT, () => {
+        console.log(`Server running at http://localhost:${PORT}/home`);
+    });
+}
+
+module.exports = app;
+
