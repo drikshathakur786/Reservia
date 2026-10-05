@@ -31,10 +31,10 @@
     </div>
 </div>
 </a>
-<p style = "margin-bottom: 1rem; font-size: 0.9rem;"> Restaurant St, Delicious City, London 9578, UK </p>
-        <p> <a href = "mailto:support@reservia.com" style = "text-decoration: none; color: #B8860B;"> support@reservia.com </a> </p>
-        <p> <a href = "tel:+1234567890" style = "text-decoration: none; color: #B8860B;"> +1 (234) 567-890 </a> </p>
-        <p style = "margin-top: 1rem; font-size: 0.9rem;"> Open: 10:00 AM - 11:00 PM </p>
+<p style = "margin-bottom: 1rem; font-size: 0.9rem;"> 123 Culinary Avenue, Food City </p>
+        <p> <a href = "mailto:concierge@reservia.com" style = "text-decoration: none; color: #B8860B;"> concierge@reservia.com </a> </p>
+        <p> <a href = "tel:+919876543210" style = "text-decoration: none; color: #B8860B;"> +91 98765 43210 </a> </p>
+        <p style = "margin-top: 1rem; font-size: 0.9rem;"> Lunch: 12:00 PM – 3:30 PM <br> Dinner: 6:30 PM – 11:00 PM </p>
 </div>
 
 <div>
@@ -42,7 +42,7 @@
         <ul style = "list-style: none; padding: 0; line-height: 2;">
         <li> <a href = "/home" style = "text-decoration: none; color: inherit;"> Home </a> </li>
         <li> <a href = "/reservation" style = "text-decoration: none; color: inherit;"> Reservations </a> </li>
-        <li> <a href = "#menu" style = "text-decoration: none; color: inherit;"> Menu </a> </li>
+        <li> <a href = "/explore" style = "text-decoration: none; color: inherit;"> Restaurants </a> </li>
         <li> <a href = "/about" style = "text-decoration: none; color: inherit;"> About Us </a> </li>
         <li> <a href = "/contact" style = "text-decoration: none; color: inherit;"> Contact </a> </li>
 </ul>
@@ -60,24 +60,25 @@
 </div>
 
 <div>
-<h4 style = "margin-bottom: 1rem; font-size: 3.25rem; color: #B8860B;"> Stay Updated </h4>
-<p style = "margin-bottom: 1rem; font-size: 1.2rem;"> Subscribe for the latest offers and updates! </p>
-<form action = "" style = "display: flex; gap: 0.5rem; align-items: center;">
-<input type = "email" name = "email_address" placeholder = "Your email" autocomplete = "off" 
+<h4 style = "margin-bottom: 1rem; font-size: 1.5rem; color: #B8860B;"> Stay Updated </h4>
+<p style = "margin-bottom: 1rem; font-size: 1rem;"> Subscribe for tasting invites &amp; exclusive privileges. </p>
+<form id = "subscribeForm" action = "/subscribe" method = "POST" style = "display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+<input type = "email" name = "email_address" id = "subscribeEmail" placeholder = "Your email address" required autocomplete = "off" 
 style = "
 flex: 1; 
+min-width: 180px;
 padding: 0.8rem; 
 border: 1px solid #B8860B; 
 background: #3c2b20; 
-border-radius: 5px; 
+border-radius: 4px; 
 color: #f5f5f5; 
 font-size: 0.9rem;
 ">
-<button type = "submit" style = "
+<button type = "submit" id = "subscribeBtn" style = "
 padding: 0.8rem 1.2rem; 
 background-color: #B8860B; 
 border: none; 
-border-radius: 5px; 
+border-radius: 4px; 
 font-size: 0.9rem; 
 font-weight: bold; 
 cursor: pointer; 
@@ -86,7 +87,43 @@ color: #2e1e14;
 Subscribe
 </button>
 </form>
+<p id = "subscribeMsg" style = "display: none; margin-top: 0.8rem; font-size: 0.85rem; line-height: 1.4;"></p>
 </div>
+</div>
+<script>
+    (function() {
+        var sf = document.getElementById('subscribeForm');
+        if (sf) {
+            sf.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                var btn = document.getElementById('subscribeBtn');
+                var msg = document.getElementById('subscribeMsg');
+                var inp = document.getElementById('subscribeEmail');
+                btn.disabled = true;
+                btn.textContent = 'Subscribing...';
+                try {
+                    var r = await fetch('/subscribe', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                        body: JSON.stringify({ email: inp.value })
+                    });
+                    var d = await r.json();
+                    msg.style.display = 'block';
+                    msg.style.color = d.success ? '#4ade80' : '#f87171';
+                    msg.textContent = d.message;
+                    if (d.success) inp.value = '';
+                } catch(err) {
+                    msg.style.display = 'block';
+                    msg.style.color = '#f87171';
+                    msg.textContent = 'Subscription error. Please try again.';
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = 'Subscribe';
+                }
+            });
+        }
+    })();
+</script>
 </div>
 
 <div class = "footer-bottom" style = "

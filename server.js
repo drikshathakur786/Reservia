@@ -27,6 +27,17 @@ app.use(compression());
 const User = require("./models/login");
 const Reservation = require("./models/reservation");
 const Review = require("./models/review");
+const Subscriber = require("./models/subscriber");
+const nodemailer = require("nodemailer");
+
+// Email Transporter for Newsletter & System Notifications
+const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+        user: process.env.EMAIL_USER || "driksha605@gmail.com",
+        pass: process.env.EMAIL_PASS || ""
+    }
+});
 
 
 // Helper: Interactive WhatsApp Confirmation Prompt
@@ -813,6 +824,81 @@ app.post("/login", authLimiter, [
 app.get("/logout", (req, res) => {
     req.session.destroy();
     res.redirect("/home");
+});
+
+// Newsletter Subscription Route
+app.post("/subscribe", async (req, res) => {
+    const email = (req.body.email || req.body.email_address || "").trim().toLowerCase();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    
+    if (!email || !emailRegex.test(email)) {
+        return res.status(400).json({ success: false, message: "Please provide a valid email address." });
+    }
+
+    try {
+        const existing = await Subscriber.findOne({ email });
+        if (existing) {
+            return res.json({ success: true, message: "You are already a valued subscriber to Reservia!" });
+        }
+
+        const newSubscriber = new Subscriber({ email });
+        await newSubscriber.save();
+
+        const senderEmail = process.env.EMAIL_USER || "driksha605@gmail.com";
+        const mailOptions = {
+            from: `"Reservia Concierge" <${senderEmail}>`,
+            to: email,
+            subject: "Welcome to Reservia | Your Fine Dining Journey Begins",
+            html: `
+                <div style="background-color: #1a1008; color: #f5f5f5; font-family: 'Georgia', serif; padding: 40px 20px; max-width: 600px; margin: 0 auto; border: 1px solid #c9a050; border-radius: 4px;">
+                    <div style="text-align: center; margin-bottom: 25px;">
+                        <h1 style="color: #c9a050; font-size: 28px; letter-spacing: 4px; margin: 0; font-weight: normal;">RESERVIA</h1>
+                        <p style="color: #a89a8c; font-size: 11px; letter-spacing: 4px; text-transform: uppercase; margin-top: 6px;">Fine Dining Experiences</p>
+                    </div>
+                    <div style="border-top: 1px solid rgba(201, 160, 80, 0.3); border-bottom: 1px solid rgba(201, 160, 80, 0.3); padding: 25px 0; margin-bottom: 25px;">
+                        <h2 style="color: #f5f5f5; font-size: 20px; margin-top: 0; font-weight: normal;">Welcome to Our Culinary Circle</h2>
+                        <p style="color: #d1c7bd; font-size: 15px; line-height: 1.8;">
+                            Thank you for subscribing to Reservia. As a privileged guest, you will receive exclusive previews of our seasonal chef tasting menus, invitations to secret pairing events, and concierge priority for table reservations.
+                        </p>
+                        <p style="color: #d1c7bd; font-size: 15px; line-height: 1.8;">
+                            We look forward to curating exceptional moments for you.
+                        </p>
+                        <div style="text-align: center; margin: 30px 0 10px;">
+                            <a href="http://localhost:${process.env.PORT || 8080}/reservation" style="background-color: #c9a050; color: #1a1008; padding: 14px 30px; text-decoration: none; font-weight: bold; text-transform: uppercase; letter-spacing: 1.5px; font-size: 12px; display: inline-block; border-radius: 2px;">Reserve a Table</a>
+                        </div>
+                    </div>
+                    <div style="text-align: center; color: #8a7e72; font-size: 12px; line-height: 1.6;">
+                        <p style="margin: 4px 0;"><strong style="color: #c9a050;">Reservia Concierge</strong></p>
+                        <p style="margin: 4px 0;">123 Culinary Avenue, Food City</p>
+                        <p style="margin: 4px 0;">Phone: +91 98765 43210 &bull; Email: concierge@reservia.com</p>
+                        <p style="margin: 4px 0;">Lunch: 12:00 PM – 3:30 PM | Dinner: 6:30 PM – 11:00 PM</p>
+                    </div>
+                </div>
+            `
+        };
+
+        if (process.env.EMAIL_PASS) {
+            try {
+                await transporter.sendMail(mailOptions);
+                console.log(`✉️ [Newsletter] Welcome email dispatched from ${senderEmail} to ${email}`);
+            } catch (mailErr) {
+                console.warn(`⚠️ [Newsletter] Email dispatch failed:`, mailErr.message);
+            }
+        } else {
+            console.log(`\n======================================================`);
+            console.log(`✉️ [Newsletter Simulation] Welcome email queued:`);
+            console.log(`From: ${senderEmail}`);
+            console.log(`To: ${email}`);
+            console.log(`Subject: ${mailOptions.subject}`);
+            console.log(`Tip: Add EMAIL_PASS (Gmail App Password) in .env to send live emails via Gmail SMTP.`);
+            console.log(`======================================================\n`);
+        }
+
+        return res.json({ success: true, message: "Welcome to Reservia! A confirmation email has been dispatched." });
+    } catch (err) {
+        console.error("Subscription error:", err);
+        return res.status(500).json({ success: false, message: "Unable to process subscription right now. Please try again." });
+    }
 });
 
 // 404 handler — must be last

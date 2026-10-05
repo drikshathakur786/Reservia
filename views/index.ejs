@@ -122,9 +122,9 @@
 
                             <div class = "contact-label"> Need Assistance? Call Us </div>
 
-                            <a href = "tel:+804001234567" class = "body-1 contact-number hover-underline"> +80 (400) 123 4567 </a>
+                            <a href = "tel:+919876543210" class = "body-1 contact-number hover-underline"> +91 98765 43210 </a>
 
-                            <a href = "#" class = "btn btn-primary">
+                            <a href = "/about" class = "btn btn-primary">
                                 <span class = "text text-1"> Discover More </span>
                                 <span class = "text text-2" aria-hidden = "true"> Discover More </span>
                             </a> 
@@ -287,10 +287,10 @@
                         </ul>
 
                         <p class = "menu-text text-center">
-                            Available for reservations daily from <span class = "span">7:00 pm</span> to <span class = "span">10:00 pm</span>
+                            Available for reservations daily: <span class = "span">Lunch 12:00 PM – 3:30 PM</span> &amp; <span class = "span">Dinner 6:30 PM – 11:00 PM</span>
                         </p>
 
-                        <a href = "#" class = "btn btn-primary">
+                        <a href = "/reservation" class = "btn btn-primary">
                             <span class = "text text-1"> Book Your Experience </span>
                             <span class = "text text-2" aria-hidden = "true"> Book Your Experience </span>
                         </a>
@@ -302,95 +302,43 @@
 
                 <section class = "reservation" data-aos="zoom-in" data-aos-duration="1000">
                     <div class = "container">
-                        <div class = "form reservation-form bg-black-10">
-                            <form action = "" class = "form-left">
-                                <h2 class = "headline-1 text-center"> Book Your Table </h2>
-
-                                <p class = "form-text text-center">
-                                    Have questions? Call us at <a href = "tel:+911234567890" class = "link"> +91-123-456-7890 </a> 
-                                    or fill out the reservation form below.
+                        <div class = "form reservation-form bg-black-10" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; align-items: center;">
+                            <div class = "form-left" style="padding: 40px 30px;">
+                                <p class = "label-2 section-subtitle" style="color: hsl(42, 48%, 77%);"> Reserve. Relax. Rejoice. </p>
+                                <h2 class = "headline-1" style="margin-bottom: 20px;"> Book Your Table </h2>
+                                <p class = "form-text" style="font-size: 1.1rem; line-height: 1.7; color: rgba(255,255,255,0.7); margin-bottom: 24px;">
+                                    Experience fine dining with guaranteed real-time table allocation, personalized ambiance, and automated arrival confirmation via WhatsApp.
                                 </p>
+                                
+                                <ul style="list-style: none; padding: 0; margin-bottom: 32px; line-height: 2; color: rgba(255,255,255,0.85); font-size: 1.05rem;">
+                                    <li>✦ <strong>Real-Time Allocation:</strong> Zero double-booking with atomic race-condition safety.</li>
+                                    <li>✦ <strong>Bespoke Ambiance:</strong> Curated acoustics from smooth jazz to classical symphony.</li>
+                                    <li>✦ <strong>WhatsApp Concierge:</strong> Seamless arrival confirmation &amp; one-click table release.</li>
+                                </ul>
 
-                                <div class = "input-wrapper">
-                                    <input type = "text" name = "name" placeholder = "Your Name" autocomplete = "off" class = "input-field">
+                                <a href = "/reservation" class = "btn btn-secondary" style="display: inline-block;">
+                                    <span class = "text text-1"> Reserve A Table Online </span>
+                                    <span class = "text text-2" aria-hidden = "true"> Reserve A Table Online </span>
+                                </a>
+                            </div>
 
-                                    <input type = "tel" name = "phone" placeholder = "Phone Number" autocomplete = "off" class = "input-field">
-                                </div>
-
-                                <div class = "input-wrapper">
-                                    <div class = "icon-wrapper">
-                                        <ion-icon name = "person-outline" aria-hidden = "true"></ion-icon>
-
-                                        <select name = "person" class = "input-field">
-                                            <option value = "1-person"> 1 Person </option>
-                                            <option value = "2-person"> 2 People </option>
-                                            <option value = "3-person"> 3 People </option>
-                                            <option value = "4-person"> 4 People </option>
-                                            <option value = "5-person"> 5 People </option>
-                                            <option value = "6-person"> 6 People </option>
-                                            <option value = "7-person"> 7+ People </option>
-                                        </select>
-
-                                        <ion-icon name = "chevron-down" aria-hidden = "true"></ion-icon>
-                                    </div>
-
-                                    <div class = "icon-wrapper">
-                                        <ion-icon name = "calendar-clear-outline" aria-hidden = "true"></ion-icon>
-
-                                        <input type = "date" name = "reservation-date" class = "input-field">
-
-                                        <ion-icon name = "chevron-down" aria-hidden = "true"></ion-icon>
-                                    </div>
-
-                                    <div class = "icon-wrapper">
-                                        <ion-icon name = "time-outline" aria-hidden = "true"></ion-icon>
-
-                                        <select name = "time" class = "input-field">
-                                            <option value = "08:00am"> 08 : 00 am </option>
-                                            <option value = "09:00am"> 09 : 00 am </option>
-                                            <option value = "10:00am"> 10 : 00 am </option>
-                                            <option value = "11:00am"> 11 : 00 am </option>
-                                            <option value = "12:00pm"> 12 : 00 pm </option>
-                                            <option value = "01:00pm"> 01 : 00 pm </option>
-                                            <option value = "02:00pm"> 02 : 00 pm </option>
-                                            <option value = "03:00pm"> 03 : 00 pm </option>
-                                            <option value = "04:00pm"> 04 : 00 pm </option>
-                                            <option value = "05:00pm"> 05 : 00 pm </option>
-                                            <option value = "06:00pm"> 06 : 00 pm </option>
-                                            <option value = "07:00pm"> 07 : 00 pm </option>
-                                            <option value = "08:00pm"> 08 : 00 pm </option>
-                                            <option value = "09:00pm"> 09 : 00 pm </option>
-                                            <option value = "10:00pm"> 10 : 00 pm </option>
-                                        </select>
-
-                                        <ion-icon name = "chevron-down" aria-hidden = "true"></ion-icon>
-                                    </div>
-                                </div>
-
-                                <textarea name = "message" placeholder = "Special Requests (Optional)" autocomplete = "off" class = "input-field"></textarea>
-
-                                <button type = "submit" class = "btn btn-secondary">
-                                    <span class = "text text-1"> Reserve Now </span>
-
-                                    <span class = "text text-2" aria-hidden = "true"> Reserve Now </span>
-                                </button>
-                            </form>
-
-                            <div class = "form-right text-center" style = "background-image: url('images/HomePageImages/form-pattern.png')">
+                            <div class = "form-right text-center" style = "background-image: url('images/HomePageImages/form-pattern.png'); padding: 40px 30px;">
                                 <h2 class = "headline-1 text-center"> Contact Us </h2>
 
                                 <p class = "contact-label"> Reservation Hotline </p>
-
-                                <a href = "tel:+911234567890" class = "body-1 contact-number hover-underline"> +91 1234567890 </a>
+                                <a href = "tel:+919876543210" class = "body-1 contact-number hover-underline"> +91 98765 43210 </a>
 
                                 <div class = "separator"></div>
-                                    <p class = "contact-label"> Working Hours </p>
+                                <p class = "contact-label"> Concierge Email </p>
+                                <a href = "mailto:concierge@reservia.com" class = "body-4 hover-underline" style="color: #fff; font-size: 1.1rem;"> concierge@reservia.com </a>
 
-                                    <p class = "body-4">
-                                        Monday to Sunday <br>
-                                        Lunch: 12:00 pm - 3:00 pm <br>
-                                        Dinner: 6:00 pm - 11:00 pm
-                                    </p>
+                                <div class = "separator"></div>
+                                <p class = "contact-label"> Operating Hours </p>
+                                <p class = "body-4">
+                                    Monday to Sunday <br>
+                                    Lunch: 12:00 PM – 3:30 PM <br>
+                                    Dinner: 6:30 PM – 11:00 PM
+                                </p>
                             </div>
                         </div>
                     </div>
