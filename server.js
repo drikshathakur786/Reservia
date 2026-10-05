@@ -430,7 +430,13 @@ const MAX_TABLES_PER_SLOT = process.env.MAX_TABLES_PER_SLOT ? parseInt(process.e
 app.post("/reservation", requireAuth, async (req, res) => {
     const images = ['assets/images/HomePageImages/logo.png', 'https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c'];
     try {
-        const { restaurant, date, time, guests } = req.body;
+        const { restaurant, date, time, guests, phone } = req.body;
+        
+        // Auto-format Indian mobile number with +91
+        let cleanPhone = (phone || "").toString().trim();
+        if (cleanPhone && !cleanPhone.startsWith("+91")) {
+            cleanPhone = "+91 " + cleanPhone.replace(/^0+/, '');
+        }
         
         // 1. PRODUCTION CHECK: Prevent past dates (backend validation)
         const selectedDate = new Date(date + 'T' + time);
@@ -501,6 +507,7 @@ app.post("/reservation", requireAuth, async (req, res) => {
             try {
                 const reservationData = { 
                     ...req.body, 
+                    phone: cleanPhone,
                     userId: req.session.userId,
                     tableNumber: assignedTable,
                     guests: Number(guests)

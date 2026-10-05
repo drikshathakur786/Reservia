@@ -47,8 +47,11 @@
                     </div>
 
                     <div class="res-form-group">
-                        <label class="res-label">Phone / WhatsApp</label>
-                        <input class="res-input" type="tel" name="phone" placeholder="+91 98765 43210">
+                        <label class="res-label">Phone / WhatsApp <span style="opacity:0.6;font-size:0.85em;">(India)</span></label>
+                        <div style="display: flex; align-items: center; border-bottom: 1px solid rgba(166,123,91,0.25);">
+                            <span style="font-family:'DM Sans', sans-serif; font-size:1.5rem; color:hsl(42,48%,77%); padding:12px 10px 12px 0; font-weight:600; border-right:1px solid rgba(166,123,91,0.2); margin-right:10px; white-space:nowrap;">🇮🇳 +91</span>
+                            <input class="res-input" style="border:none; padding:12px 0;" type="tel" name="phone" id="phone-input" required placeholder="98765 43210" pattern="[0-9]{10}" maxlength="10" title="Please enter a 10-digit Indian mobile number">
+                        </div>
                     </div>
 
                     <div class="res-form-group">
@@ -57,16 +60,30 @@
                     </div>
 
                     <div class="res-form-group">
-                        <label class="res-label">Time</label>
-                        <select class="res-input" name="time" required>
-                            <option value="" disabled selected>Select time</option>
-                            <option value="17:00">5:00 PM</option>
+                        <label class="res-label">Time <span style="opacity:0.6;font-size:0.85em;">(Pick any time)</span></label>
+                        <input class="res-input" type="time" name="time" id="time-input" required style="color-scheme: dark; cursor: pointer;" list="dining-times" value="19:30">
+                        <datalist id="dining-times">
+                            <option value="11:30">11:30 AM (Lunch)</option>
+                            <option value="12:00">12:00 PM</option>
+                            <option value="12:30">12:30 PM</option>
+                            <option value="13:00">1:00 PM</option>
+                            <option value="13:30">1:30 PM</option>
+                            <option value="14:00">2:00 PM</option>
+                            <option value="14:30">2:30 PM</option>
+                            <option value="17:00">5:00 PM (High Tea / Early Dinner)</option>
+                            <option value="17:30">5:30 PM</option>
                             <option value="18:00">6:00 PM</option>
+                            <option value="18:30">6:30 PM</option>
                             <option value="19:00">7:00 PM</option>
-                            <option value="20:00">8:00 PM</option>
+                            <option value="19:30">7:30 PM</option>
+                            <option value="20:00">8:00 PM (Prime Dinner)</option>
+                            <option value="20:30">8:30 PM</option>
                             <option value="21:00">9:00 PM</option>
-                            <option value="22:00">10:00 PM</option>
-                        </select>
+                            <option value="21:30">9:30 PM</option>
+                            <option value="22:00">10:00 PM (Late Dinner)</option>
+                            <option value="22:30">10:30 PM</option>
+                            <option value="23:00">11:00 PM</option>
+                        </datalist>
                     </div>
 
                     <div class="res-form-group">
