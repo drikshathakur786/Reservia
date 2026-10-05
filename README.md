@@ -12,20 +12,30 @@ Built from the ground up with Node.js, Express, and MongoDB. No templates, no bo
 
 ## The Problem
 
-Table reservations shouldn't break during peak dining hours. Most systems are either bloated third-party aggregators charging hefty commissions or simplistic booking forms that collapse under concurrent surges, causing double-bookings, phantom reservations, and frustrated guests. Reservia is the sweet spot — delivering a luxury, custom-tailored dining experience on the frontend backed by enterprise-grade concurrency safety and automated operational hygiene on the backend.
+Table reservations shouldn't break during peak dining hours. Most systems are either bloated third-party aggregators charging hefty commissions or simplistic booking forms that collapse under concurrent surges, causing double-bookings, phantom reservations, and frustrated guests. Furthermore, aggregators suffer from operational disconnects, non-refundable booking fees, and rampant no-shows. 
+
+Reservia is the sweet spot — delivering a luxury, custom-tailored dining experience on the frontend backed by enterprise-grade concurrency safety, automated WhatsApp reconfirmation, floor no-show management, and operational hygiene on the backend.
 
 ---
 
 ## What It Does
 
 ### Smart Reservations & Concurrency Protection ⚡
-Users can book tables in real time across multiple restaurants. During high-traffic booking surges, an atomic table allocation loop backed by MongoDB compound unique indexes (`restaurant`, `date`, `time`, `tableNumber`) strictly prevents race conditions and overbooking. Past dates and times are rejected automatically, and a 3-active-reservation cap prevents spam.
+Users can book tables in real time across multiple restaurants with flexible scheduling (lunch, high tea, prime dinner, or custom minute selection) and standard Indian mobile formatting (`🇮🇳 +91`). During high-traffic booking surges, an atomic table allocation loop backed by MongoDB compound unique indexes (`restaurant`, `date`, `time`, `tableNumber`) strictly prevents race conditions and overbooking. Past dates and times are rejected automatically, and a 3-active-reservation cap prevents spam.
 
-### Role-Based Admin Command Center 📊
-Admins get a dedicated B2B operations dashboard (`/admin`) to monitor business vitals in real time — total registered users, overall booking volume, live-calculated revenue (per guest cover), and latest reservation telemetry.
+### Automated WhatsApp Reconfirmation & Two-Way Webhook 📲
+To eliminate the classic industry "no-show" problem without demanding friction-heavy upfront credit card deposits, a background worker runs every 15 minutes checking for bookings coming up in the next 2 hours. It dispatches interactive WhatsApp confirmation prompts. A dedicated two-way webhook (`POST /webhook/whatsapp`) listens for customer responses:
+* **Reply 1 or CONFIRM:** Confirms patron arrival status in real time.
+* **Reply 2 or CANCEL:** Automatically cancels the booking with zero penalty and immediately releases the table back into the available pool for walk-in or waitlisted diners!
+
+### Role-Based Admin Command Center & Floor Operations 📊
+Admins get a dedicated B2B operations dashboard (`/admin`) to monitor business vitals in real time — total registered users, overall booking volume, live-calculated revenue (per guest cover), and latest reservation telemetry. Managers have direct floor controls:
+* **Seat Guest:** Instantly updates booking to completed upon arrival.
+* **Mark No-Show:** Enforces the 15-minute grace period policy; if a patron doesn't show, the manager marks them as `No-Show`, instantly freeing the table slot in the database.
+* **📲 Ping:** Manually triggers on-demand WhatsApp confirmation pings.
 
 ### Automated Data Hygiene (Cron Worker) ⏱️
-A background cron service (`node-cron`) runs every hour (`0 * * * *`) to automatically sweep expired reservations and transition them from `"Reserved"` to `"Completed"`, eliminating manual record updates for restaurant staff.
+A background cron service (`node-cron`) sweeps expired reservations and transitions them from `"Reserved"` to `"Completed"`, eliminating manual record updates for restaurant staff.
 
 ### Reviews & Community Feedback ⭐
 Guests can share dining feedback with star ratings, browse customer experiences, edit or delete their reviews, and like feedback in real time.
@@ -42,6 +52,7 @@ Built with zero shortcuts: brute-force mitigation on auth routes via `express-ra
 | **Backend** | Node.js (ES6+), Express 5, Mongoose (ODM), node-cron |
 | **Frontend** | EJS (Embedded JavaScript Templates), Vanilla JavaScript, CSS3 |
 | **Database** | MongoDB Atlas & Connect-Mongo (persistent session store) |
+| **Messaging & Webhooks**| WhatsApp Cloud API / Webhook integration (2-way reconfirmation & table release) |
 | **Security & Auth** | Express Session, BCrypt, Helmet, Express Rate Limit, Express Validator |
 | **Testing & CI** | Jest, Supertest, MongoMemoryServer, GitHub Actions CI |
 | **Hosting** | Render (Web Service) · MongoDB Atlas (Cloud Database) |
@@ -56,8 +67,11 @@ Built with zero shortcuts: brute-force mitigation on auth routes via `express-ra
 │  (EJS / CSS)     │   Cookie-Based Session   │   (Render Web Svc)   │   Connection Pool  │ (Cloud Database) │
 └──────────────────┘                          └──────────────────────┘                    └──────────────────┘
                                                          │
-                                                  node-cron Worker
-                                              (Hourly Auto-Completion)
+                                        ┌────────────────┴────────────────┐
+                                        ▼                                 ▼
+                                node-cron Schedulers             POST /webhook/whatsapp
+                           (Hourly Expiration Sweeps &        (Two-Way Reconfirm / Cancel
+                           15-Min WhatsApp Reminders)          Instant Table Release)
 ```
 
 The frontend is rendered server-side with custom EJS templates and styled with a luxury dark-theme aesthetic. Authentication and session state are managed via cryptographically signed HTTP cookies tied directly to a persistent MongoDB session store (`connect-mongo`). 
@@ -69,12 +83,12 @@ Incoming requests pass through a security middleware pipeline (Helmet headers, r
 Reservia/
 ├── models/               # Mongoose schemas & compound indexes
 │   ├── login.js          # User schema with BCrypt pre-save hooks & roles
-│   ├── reservation.js    # Reservation schema with unique slot indexes
+│   ├── reservation.js    # Reservation schema with unique slot indexes & confirmation state
 │   └── review.js         # Guest feedback & ratings schema
 ├── views/                # EJS templates (Luxury dark-theme interface)
 │   ├── index.ejs         # Hero landing page & dining highlights
-│   ├── admin.ejs         # Live analytics & reservation management dashboard
-│   ├── reservation.ejs   # Interactive table booking form
+│   ├── admin.ejs         # Live analytics, telemetry & floor action dashboard
+│   ├── reservation.ejs   # Flexible table booking form with +91 Indian format & timepicker
 │   ├── order.ejs         # User booking history & active reservation tracker
 │   ├── reviews.ejs       # Community review feed
 │   └── ...
@@ -88,7 +102,7 @@ Reservia/
 │   ├── roles.test.js     # RBAC & admin route authorization tests
 │   └── setup.js          # In-memory MongoDB testing environment
 ├── .github/              # GitHub Actions CI workflow definitions
-└── server.js             # Core Express application, routing, middleware & cron
+└── server.js             # Core Express application, routing, webhooks & cron services
 ```
 
 ---
@@ -104,7 +118,7 @@ Reservia/
 | `POST` | `/sign-up` | Registers new user with input validation & BCrypt hashing | Public (Rate Limited) |
 | `POST` | `/login` | Authenticates user credentials & creates Mongo session | Public (Rate Limited) |
 | `GET` | `/logout` | Destroys active session & clears cookies | Authenticated |
-| `GET` | `/reservation` | Displays table reservation interface | Authenticated |
+| `GET` | `/reservation` | Displays table reservation interface (flexible timepicker & +91 support) | Authenticated |
 | `POST` | `/reservation` | Books table with atomic race-condition protection | Authenticated |
 | `GET` | `/order` | View user's active and past reservations | Authenticated |
 | `PUT` | `/reservation/:id` | Update booking details (IDOR protected) | Authenticated |
@@ -117,9 +131,9 @@ Reservia/
 | `PUT` | `/reviews/:id` | Edit review content | Public |
 | `DELETE` | `/reviews/:id` | Remove a review | Public |
 | `GET` | `/admin` | Real-time analytics, revenue metrics & booking table | Admin Only |
-| `POST` | `/admin/reservation/:id/status` | Floor action: Seat guest or mark No-Show (frees table) | Admin Only |
+| `POST` | `/admin/reservation/:id/status` | Floor action: Seat guest or mark No-Show (instantly frees table) | Admin Only |
 | `POST` | `/admin/reservation/:id/ping-whatsapp` | Manually dispatch WhatsApp confirmation message | Admin Only |
-| `POST` | `/webhook/whatsapp` | Webhook: Processes guest reply (1=Confirm, 2=Cancel) | Webhook / Public |
+| `POST` | `/webhook/whatsapp` | Webhook: Processes guest reply (1=Confirm, 2=Cancel & Free Table) | Webhook / Public |
 | `GET` | `/make-me-admin` | Demo helper to grant admin privileges to current session | Authenticated |
 | `GET` | `/test-cron` | Manually trigger reservation auto-completion job | Admin Only |
 
