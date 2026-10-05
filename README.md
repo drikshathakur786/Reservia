@@ -70,8 +70,7 @@ Reservia/
 ├── models/               # Mongoose schemas & compound indexes
 │   ├── login.js          # User schema with BCrypt pre-save hooks & roles
 │   ├── reservation.js    # Reservation schema with unique slot indexes
-│   ├── review.js         # Guest feedback & ratings schema
-│   └── slotCounter.js    # Concurrency capacity counter
+│   └── review.js         # Guest feedback & ratings schema
 ├── views/                # EJS templates (Luxury dark-theme interface)
 │   ├── index.ejs         # Hero landing page & dining highlights
 │   ├── admin.ejs         # Live analytics & reservation management dashboard

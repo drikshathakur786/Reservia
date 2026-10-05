@@ -27,7 +27,6 @@ app.use(compression());
 const User = require("./models/login");
 const Reservation = require("./models/reservation");
 const Review = require("./models/review");
-const SlotCounter = require("./models/slotCounter");
 
 
 // Background Task: Auto-complete past reservations every hour (disabled during test runs)
