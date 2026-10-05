@@ -1,5 +1,9 @@
 // server.js
 require("dotenv").config();
+const dns = require("node:dns");
+if (dns.setDefaultResultOrder) {
+    dns.setDefaultResultOrder("ipv4first");
+}
 const express = require("express");
 const path = require("path");
 const mongoose = require("mongoose");
@@ -35,6 +39,7 @@ const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 465,
     secure: true, // Direct SSL
+    family: 4, // Force IPv4 to prevent ENETUNREACH on cloud containers
     auth: {
         user: (process.env.EMAIL_USER || "driksha605@gmail.com").trim(),
         pass: (process.env.EMAIL_PASS || "").replace(/[\s"']/g, "")
