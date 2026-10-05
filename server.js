@@ -32,12 +32,28 @@ const nodemailer = require("nodemailer");
 
 // Email Transporter for Newsletter & System Notifications
 const transporter = nodemailer.createTransport({
-    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true, // Direct SSL
     auth: {
         user: (process.env.EMAIL_USER || "driksha605@gmail.com").trim(),
         pass: (process.env.EMAIL_PASS || "").replace(/[\s"']/g, "")
-    }
+    },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000
 });
+
+// Verify SMTP connection on startup
+if (process.env.EMAIL_PASS) {
+    transporter.verify((error, success) => {
+        if (error) {
+            console.error("⚠️ [Nodemailer] SMTP Connection Error:", error.message);
+        } else {
+            console.log("✅ [Nodemailer] SMTP Server is ready to dispatch emails from:", process.env.EMAIL_USER || "driksha605@gmail.com");
+        }
+    });
+}
 
 
 // Helper: Interactive WhatsApp Confirmation Prompt
@@ -837,14 +853,21 @@ app.post("/subscribe", async (req, res) => {
 
     try {
         const existing = await Subscriber.findOne({ email });
-        if (existing) {
-            return res.json({ success: true, message: "You are already a valued subscriber to Reservia!" });
+        if (!existing) {
+            const newSubscriber = new Subscriber({ email });
+            await newSubscriber.save();
         }
 
-        const newSubscriber = new Subscriber({ email });
-        await newSubscriber.save();
+        // 1. Respond instantly to browser (< 100ms) so user never experiences long loading
+        res.json({ 
+            success: true, 
+            message: existing 
+                ? "Welcome back! A fresh confirmation email has been dispatched." 
+                : "Welcome to Reservia! A confirmation email has been dispatched." 
+        });
 
-        const senderEmail = process.env.EMAIL_USER || "driksha605@gmail.com";
+        // 2. Dispatch email asynchronously in background
+        const senderEmail = (process.env.EMAIL_USER || "driksha605@gmail.com").trim();
         const mailOptions = {
             from: `"Reservia Concierge" <${senderEmail}>`,
             to: email,
@@ -864,7 +887,7 @@ app.post("/subscribe", async (req, res) => {
                             We look forward to curating exceptional moments for you.
                         </p>
                         <div style="text-align: center; margin: 30px 0 10px;">
-                            <a href="http://localhost:${process.env.PORT || 8080}/reservation" style="background-color: #c9a050; color: #1a1008; padding: 14px 30px; text-decoration: none; font-weight: bold; text-transform: uppercase; letter-spacing: 1.5px; font-size: 12px; display: inline-block; border-radius: 2px;">Reserve a Table</a>
+                            <a href="https://reservia-x130.onrender.com/reservation" style="background-color: #c9a050; color: #1a1008; padding: 14px 30px; text-decoration: none; font-weight: bold; text-transform: uppercase; letter-spacing: 1.5px; font-size: 12px; display: inline-block; border-radius: 2px;">Reserve a Table</a>
                         </div>
                     </div>
                     <div style="text-align: center; color: #8a7e72; font-size: 12px; line-height: 1.6;">
@@ -878,23 +901,16 @@ app.post("/subscribe", async (req, res) => {
         };
 
         if (process.env.EMAIL_PASS) {
-            try {
-                await transporter.sendMail(mailOptions);
-                console.log(`✉️ [Newsletter] Welcome email dispatched from ${senderEmail} to ${email}`);
-            } catch (mailErr) {
-                console.warn(`⚠️ [Newsletter] Email dispatch failed:`, mailErr.message);
-            }
+            transporter.sendMail(mailOptions)
+                .then(info => {
+                    console.log(`✉️ [Newsletter] Email successfully delivered to ${email}. MessageId: ${info.messageId}`);
+                })
+                .catch(mailErr => {
+                    console.error(`❌ [Newsletter] Failed to dispatch email to ${email}:`, mailErr.message);
+                });
         } else {
-            console.log(`\n======================================================`);
-            console.log(`✉️ [Newsletter Simulation] Welcome email queued:`);
-            console.log(`From: ${senderEmail}`);
-            console.log(`To: ${email}`);
-            console.log(`Subject: ${mailOptions.subject}`);
-            console.log(`Tip: Add EMAIL_PASS (Gmail App Password) in .env to send live emails via Gmail SMTP.`);
-            console.log(`======================================================\n`);
+            console.log(`✉️ [Newsletter Simulation] Welcome email queued for ${email} (EMAIL_PASS not found)`);
         }
-
-        return res.json({ success: true, message: "Welcome to Reservia! A confirmation email has been dispatched." });
     } catch (err) {
         console.error("Subscription error:", err);
         return res.status(500).json({ success: false, message: "Unable to process subscription right now. Please try again." });
