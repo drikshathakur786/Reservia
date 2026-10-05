@@ -135,6 +135,35 @@
             color: rgba(255,255,255,0.6);
             border: 1px solid rgba(255,255,255,0.2);
         }
+
+        .status-noshow {
+            background: rgba(239,68,68,0.15);
+            color: #f87171;
+            border: 1px solid rgba(248,113,113,0.3);
+        }
+
+        .status-cancelled {
+            background: rgba(156,163,175,0.15);
+            color: #9ca3af;
+            border: 1px solid rgba(156,163,175,0.3);
+        }
+
+        .btn-action {
+            padding: 5px 12px;
+            font-size: 0.8rem;
+            border-radius: 3px;
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+            font-weight: 600;
+            transition: opacity 0.2s, transform 0.1s;
+            margin-right: 6px;
+        }
+
+        .btn-action:hover { opacity: 0.85; transform: scale(1.02); }
+        .btn-seat { background: #22c55e; color: #000; }
+        .btn-noshow { background: #ef4444; color: #fff; }
+        .btn-ping { background: #25d366; color: #000; }
     </style>
 </head>
 <body>
@@ -170,31 +199,59 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>Guest Name</th>
-                            <th>Restaurant</th>
+                            <th>Guest & Contact</th>
+                            <th>Restaurant & Table</th>
                             <th>Date & Time</th>
-                            <th>Party Size</th>
-                            <th>Status</th>
+                            <th>Party</th>
+                            <th>Status & Confirmation</th>
+                            <th>Floor Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         <% if(recentReservations.length > 0) { %>
                             <% recentReservations.forEach(res => { %>
-                                <tr>
-                                    <td><%= res.name %></td>
-                                    <td><%= res.restaurant %></td>
-                                    <td><%= res.date %> @ <%= res.time %></td>
+                                <tr id="row-<%= res._id %>">
+                                    <td>
+                                        <strong><%= res.name %></strong><br>
+                                        <small style="opacity:0.7;"><%= res.phone || res.email %></small>
+                                    </td>
+                                    <td>
+                                        <%= res.restaurant %><br>
+                                        <span style="font-size:0.8rem; color:hsl(42, 48%, 77%); font-weight:600;">Table #<%= res.tableNumber || 1 %></span>
+                                    </td>
+                                    <td><%= res.date %><br><small style="opacity:0.7;"><%= res.time %></small></td>
                                     <td><%= res.guests %> Guests</td>
                                     <td>
-                                        <span class="status-badge <%= res.status === 'Reserved' ? 'status-reserved' : 'status-completed' %>">
+                                        <% let badgeClass = 'status-reserved';
+                                           if (res.status === 'Completed') badgeClass = 'status-completed';
+                                           else if (res.status === 'No-Show') badgeClass = 'status-noshow';
+                                           else if (res.status === 'Cancelled') badgeClass = 'status-cancelled';
+                                        %>
+                                        <span class="status-badge <%= badgeClass %>">
                                             <%= res.status || 'Reserved' %>
                                         </span>
+                                        <div style="margin-top:6px; font-size:0.78rem;">
+                                            <% if (res.isConfirmed) { %>
+                                                <span style="color:#4ade80;">✓ Confirmed</span>
+                                            <% } else { %>
+                                                <span style="color:#facc15;">⏳ Pending Ping</span>
+                                            <% } %>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <% if (res.status === 'Reserved') { %>
+                                            <button onclick="updateStatus('<%= res._id %>', 'Completed')" class="btn-action btn-seat" title="Mark guest seated">Seat</button>
+                                            <button onclick="updateStatus('<%= res._id %>', 'No-Show')" class="btn-action btn-noshow" title="Mark no-show & free table">No-Show</button>
+                                            <button onclick="sendPing('<%= res._id %>')" class="btn-action btn-ping" title="Send WhatsApp confirmation ping">📲 Ping</button>
+                                        <% } else { %>
+                                            <span style="opacity:0.5; font-size:0.85rem;">Completed</span>
+                                        <% } %>
                                     </td>
                                 </tr>
                             <% }) %>
                         <% } else { %>
                             <tr>
-                                <td colspan="5" style="text-align: center; padding: 40px; color: rgba(255,255,255,0.4);">
+                                <td colspan="6" style="text-align: center; padding: 40px; color: rgba(255,255,255,0.4);">
                                     No reservations found in the database.
                                 </td>
                             </tr>
@@ -208,5 +265,42 @@
     <%- include("includes/footer.ejs") %>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <script>
+        async function updateStatus(id, status) {
+            const confirmMsg = status === 'No-Show' 
+                ? "Mark as No-Show? This will immediately free Table slot for walk-in guests." 
+                : "Mark guest as Seated / Completed?";
+            if (!confirm(confirmMsg)) return;
+
+            try {
+                const res = await fetch(`/admin/reservation/${id}/status`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify({ status })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    alert(data.message || "Failed to update.");
+                }
+            } catch (err) {
+                alert("Network error.");
+            }
+        }
+
+        async function sendPing(id) {
+            try {
+                const res = await fetch(`/admin/reservation/${id}/ping-whatsapp`, {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json' }
+                });
+                const data = await res.json();
+                alert(data.message || "WhatsApp notification sent!");
+            } catch (err) {
+                alert("Failed to send ping.");
+            }
+        }
+    </script>
 </body>
 </html>

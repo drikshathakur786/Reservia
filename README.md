@@ -117,6 +117,9 @@ Reservia/
 | `PUT` | `/reviews/:id` | Edit review content | Public |
 | `DELETE` | `/reviews/:id` | Remove a review | Public |
 | `GET` | `/admin` | Real-time analytics, revenue metrics & booking table | Admin Only |
+| `POST` | `/admin/reservation/:id/status` | Floor action: Seat guest or mark No-Show (frees table) | Admin Only |
+| `POST` | `/admin/reservation/:id/ping-whatsapp` | Manually dispatch WhatsApp confirmation message | Admin Only |
+| `POST` | `/webhook/whatsapp` | Webhook: Processes guest reply (1=Confirm, 2=Cancel) | Webhook / Public |
 | `GET` | `/make-me-admin` | Demo helper to grant admin privileges to current session | Authenticated |
 | `GET` | `/test-cron` | Manually trigger reservation auto-completion job | Admin Only |
 

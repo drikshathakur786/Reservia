@@ -29,8 +29,21 @@ const Reservation = require("./models/reservation");
 const Review = require("./models/review");
 
 
-// Background Task: Auto-complete past reservations every hour (disabled during test runs)
+// Helper: Interactive WhatsApp Confirmation Prompt
+async function sendWhatsAppConfirmation(reservation) {
+    const phone = reservation.phone || "No phone provided";
+    console.log(`\n======================================================`);
+    console.log(`📲 [WhatsApp Service] Outgoing Confirmation Message:`);
+    console.log(`To: ${reservation.name} (${phone})`);
+    console.log(`Restaurant: ${reservation.restaurant} | Slot: ${reservation.date} @ ${reservation.time} | Table #${reservation.tableNumber}`);
+    console.log(`Message: "Hello ${reservation.name}! Please confirm your table for ${reservation.guests} guests tonight at ${reservation.restaurant}. Reply '1' or 'CONFIRM' to confirm, or '2' or 'CANCEL' to cancel."`);
+    console.log(`Simulate Reply via Webhook: POST /webhook/whatsapp with { "reservationId": "${reservation._id}", "action": "CONFIRM" | "CANCEL" }`);
+    console.log(`======================================================\n`);
+}
+
+// Background Task: Auto-complete past reservations & 2-hr WhatsApp reconfirmation sweeps
 if (process.env.NODE_ENV !== 'test') {
+    // 1. Hourly cron: Auto-complete past reservations
     cron.schedule('0 * * * *', async () => {
         console.log('Running cron job: Marking past reservations as Completed');
         try {
@@ -46,6 +59,30 @@ if (process.env.NODE_ENV !== 'test') {
             }
         } catch (err) {
             console.error('Cron Error:', err);
+        }
+    });
+
+    // 2. 15-Minute cron: Scan upcoming reservations within next 2 hours and dispatch WhatsApp confirmation
+    cron.schedule('*/15 * * * *', async () => {
+        try {
+            const now = new Date();
+            const twoHoursLater = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+            
+            const upcomingReservations = await Reservation.find({
+                status: 'Reserved',
+                confirmationSent: false
+            });
+
+            for (let res of upcomingReservations) {
+                const resDate = new Date(`${res.date}T${res.time}`);
+                if (resDate >= now && resDate <= twoHoursLater) {
+                    await sendWhatsAppConfirmation(res);
+                    res.confirmationSent = true;
+                    await res.save();
+                }
+            }
+        } catch (err) {
+            console.error('WhatsApp Cron Error:', err);
         }
     });
 }
@@ -184,6 +221,120 @@ app.get("/admin", requireAdmin, async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).send("Admin Error");
+    }
+});
+
+// Admin Floor Action: Update reservation status (Seat Guest, Mark No-Show, Cancel)
+app.post("/admin/reservation/:id/status", requireAdmin, async (req, res) => {
+    try {
+        const { status } = req.body;
+        const allowedStatuses = ['Reserved', 'Completed', 'Cancelled', 'No-Show'];
+        if (!allowedStatuses.includes(status)) {
+            return res.status(400).json({ message: "Invalid status value." });
+        }
+
+        const updateData = { status };
+        if (status === 'Completed') {
+            updateData.isConfirmed = true;
+        }
+
+        const reservation = await Reservation.findByIdAndUpdate(
+            req.params.id,
+            updateData,
+            { new: true }
+        );
+
+        if (!reservation) {
+            return res.status(404).json({ message: "Reservation not found." });
+        }
+
+        console.log(`[Admin Action] Reservation #${reservation._id} marked as '${status}' by manager.`);
+
+        if (req.headers.accept && req.headers.accept.includes('application/json')) {
+            return res.json({ 
+                success: true, 
+                message: `Status updated to ${status}. ${status === 'No-Show' ? 'Table slot immediately freed for walk-ins.' : ''}`,
+                reservation 
+            });
+        }
+        res.redirect("/admin");
+    } catch (err) {
+        console.error("Admin status update error:", err);
+        res.status(500).json({ message: "Failed to update reservation status." });
+    }
+});
+
+// Admin Floor Action: Trigger on-demand WhatsApp confirmation ping
+app.post("/admin/reservation/:id/ping-whatsapp", requireAdmin, async (req, res) => {
+    try {
+        const reservation = await Reservation.findById(req.params.id);
+        if (!reservation) {
+            return res.status(404).json({ message: "Reservation not found." });
+        }
+
+        await sendWhatsAppConfirmation(reservation);
+        reservation.confirmationSent = true;
+        await reservation.save();
+
+        if (req.headers.accept && req.headers.accept.includes('application/json')) {
+            return res.json({ success: true, message: `WhatsApp confirmation ping sent to ${reservation.name}!` });
+        }
+        res.redirect("/admin");
+    } catch (err) {
+        console.error("Admin WhatsApp ping error:", err);
+        res.status(500).json({ message: "Failed to send WhatsApp ping." });
+    }
+});
+
+// WhatsApp / SMS Webhook: Process guest response (1/CONFIRM or 2/CANCEL)
+app.post("/webhook/whatsapp", async (req, res) => {
+    try {
+        const bodyText = (req.body.Body || req.body.action || req.body.message || "").toString().trim().toUpperCase();
+        const fromPhone = (req.body.From || req.body.phone || "").toString().replace(/\D/g, "");
+        const reservationId = req.body.reservationId;
+
+        let query = {};
+        if (reservationId) {
+            query._id = reservationId;
+        } else if (fromPhone) {
+            query.phone = { $regex: new RegExp(fromPhone.slice(-10) + "$") };
+            query.status = "Reserved";
+        } else {
+            return res.status(400).json({ message: "Provide either reservationId or guest phone number." });
+        }
+
+        const reservation = await Reservation.findOne(query).sort({ createdAt: -1 });
+        if (!reservation) {
+            return res.status(404).json({ message: "No active reservation matching your request was found." });
+        }
+
+        if (bodyText === "1" || bodyText === "CONFIRM" || bodyText.includes("CONFIRM")) {
+            reservation.isConfirmed = true;
+            await reservation.save();
+            console.log(`[WhatsApp Webhook] Guest ${reservation.name} confirmed arrival for table #${reservation.tableNumber}.`);
+            return res.json({ 
+                success: true, 
+                action: "CONFIRMED", 
+                message: `Thank you ${reservation.name}! Your table for ${reservation.guests} at ${reservation.restaurant} is confirmed.` 
+            });
+        } else if (bodyText === "2" || bodyText === "CANCEL" || bodyText.includes("CANCEL")) {
+            reservation.status = "Cancelled";
+            await reservation.save();
+            console.log(`[WhatsApp Webhook] Guest ${reservation.name} cancelled reservation #${reservation._id}. Table #${reservation.tableNumber} is now freed.`);
+            return res.json({ 
+                success: true, 
+                action: "CANCELLED", 
+                message: `Your reservation at ${reservation.restaurant} has been cancelled without penalty. The table has been released.` 
+            });
+        } else {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Unrecognized command. Reply with '1' (or CONFIRM) or '2' (or CANCEL)." 
+            });
+        }
+    } catch (err) {
+        console.error("WhatsApp Webhook Error:", err);
+        res.status(500).json({ error: "Failed to process webhook event." });
     }
 });
 
