@@ -242,7 +242,7 @@
                                         <% if (res.status === 'Reserved') { %>
                                             <button onclick="updateStatus('<%= res._id %>', 'Completed')" class="btn-action btn-seat" title="Mark guest seated">Seat</button>
                                             <button onclick="updateStatus('<%= res._id %>', 'No-Show')" class="btn-action btn-noshow" title="Mark no-show & free table">No-Show</button>
-                                            <button onclick="sendPing('<%= res._id %>')" class="btn-action btn-ping" title="Send WhatsApp confirmation ping">📲 Ping</button>
+                                            <button onclick="sendPing('<%= res._id %>', '<%= res.phone || '' %>', '<%= res.name || '' %>', '<%= res.restaurant || '' %>', '<%= res.time || '' %>', '<%= res.guests || 1 %>')" class="btn-action btn-ping" title="Send WhatsApp confirmation ping">📲 Ping</button>
                                         <% } else { %>
                                             <span style="opacity:0.5; font-size:0.85rem;">Completed</span>
                                         <% } %>
@@ -289,17 +289,32 @@
             }
         }
 
-        async function sendPing(id) {
+        async function sendPing(id, rawPhone, name, restaurant, time, guests) {
+            // 1. Format Indian WhatsApp number
+            let digits = (rawPhone || "").replace(/\D/g, "");
+            if (digits.length === 10) {
+                digits = "91" + digits; // prepend Indian country code
+            }
+
+            if (!digits) {
+                alert("Cannot ping: No phone number was provided for this reservation.");
+                return;
+            }
+
+            // 2. Prepare pre-filled WhatsApp message
+            const message = `Hello ${name}! ✦\n\nThis is Reservia confirming your table reservation for ${guests} guests at *${restaurant}* for *${time}*.\n\nPlease reply with:\n👉 *1* or *CONFIRM* to confirm arrival\n👉 *2* or *CANCEL* to release your table without penalty.`;
+
+            // 3. Open WhatsApp Web / App directly
+            const waUrl = `https://wa.me/${digits}?text=${encodeURIComponent(message)}`;
+            window.open(waUrl, '_blank');
+
+            // 4. Also notify backend to log and mark confirmationSent: true
             try {
-                const res = await fetch(`/admin/reservation/${id}/ping-whatsapp`, {
+                fetch(`/admin/reservation/${id}/ping-whatsapp`, {
                     method: 'POST',
                     headers: { 'Accept': 'application/json' }
-                });
-                const data = await res.json();
-                alert(data.message || "WhatsApp notification sent!");
-            } catch (err) {
-                alert("Failed to send ping.");
-            }
+                }).catch(() => {});
+            } catch (e) {}
         }
     </script>
 </body>
