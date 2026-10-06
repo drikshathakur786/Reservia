@@ -1,24 +1,30 @@
-<!-- Reservia AI Sommelier & Concierge Floating Widget -->
+<!-- Reservia Fine Dining AI Concierge & Sommelier -->
 <div id="ai-concierge-container">
-    <!-- Floating Trigger Button -->
-    <button id="ai-concierge-toggle" aria-label="Open AI Concierge">
-        <span class="ai-btn-sparkle">✦</span>
-        <span class="ai-btn-text">Ask AI Concierge</span>
+    <!-- Floating Trigger Button (Matches Reservia Creative Header/Button) -->
+    <button id="ai-concierge-toggle" aria-label="Open Reservia Concierge">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="ai-btn-star">
+            <path d="M12 2L15.5 8.5L22 12L15.5 15.5L12 22L8.5 15.5L2 12L8.5 8.5L12 2Z" fill="hsl(42, 48%, 77%)" />
+        </svg>
+        <span class="ai-btn-text">RESERVIA CONCIERGE</span>
         <span class="ai-pulse-ring"></span>
     </button>
 
     <!-- Chat Modal Window -->
     <div id="ai-concierge-modal" class="ai-modal-hidden">
-        <!-- Header -->
+        <!-- Luxury Brand Header -->
         <div class="ai-header">
             <div class="ai-header-info">
-                <div class="ai-avatar">✦</div>
-                <div>
-                    <h3 class="ai-title">Reservia Concierge</h3>
-                    <p class="ai-status"><span class="ai-status-dot"></span> AI Sommelier &amp; Host</p>
+                <div class="ai-avatar">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L15.5 8.5L22 12L15.5 15.5L12 22L8.5 15.5L2 12L8.5 8.5L12 2Z" fill="hsl(42, 48%, 77%)" />
+                    </svg>
+                </div>
+                <div class="ai-brand-titles">
+                    <span class="ai-brand-name">RESERVIA</span>
+                    <span class="ai-brand-subtitle"><span class="ai-live-indicator"></span> MAÎTRE D' &amp; SOMMELIER</span>
                 </div>
             </div>
-            <button id="ai-concierge-close" aria-label="Close Chat">&times;</button>
+            <button id="ai-concierge-close" aria-label="Close Concierge">&times;</button>
         </div>
 
         <!-- Suggestion Chips -->
@@ -33,7 +39,7 @@
         <div class="ai-messages" id="ai-messages-list">
             <div class="ai-msg ai-msg-bot">
                 <div class="ai-msg-bubble">
-                    Good evening and welcome to <strong>Reservia</strong>. I am your personal <strong>Maitre D' &amp; Sommelier</strong>.
+                    Good evening and welcome to <strong>Reservia</strong>. I am your personal <strong>Maître D' &amp; Sommelier</strong>.
                     <br><br>
                     What are you in the mood for tonight? Ask me anything — from wine pairings and chef specials, to dietary advice or planning an intimate celebration.
                 </div>
@@ -46,14 +52,14 @@
             <div class="ai-dot"></div>
             <div class="ai-dot"></div>
             <div class="ai-dot"></div>
-            <span style="font-size: 0.78rem; color: #b5a596; margin-left: 6px;">Sommelier is curating...</span>
+            <span class="ai-typing-text">Maître D' is curating...</span>
         </div>
 
         <!-- Input Area -->
         <form id="ai-chat-form" class="ai-input-form">
             <input type="text" id="ai-user-input" placeholder="Ask about wine pairings, menus, occasions..." autocomplete="off" required>
             <button type="submit" id="ai-send-btn" aria-label="Send message">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="22" y1="2" x2="11" y2="13"></line>
                     <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                 </svg>
@@ -63,94 +69,96 @@
 </div>
 
 <style>
+/* Root Container */
 #ai-concierge-container {
     position: fixed;
-    bottom: 24px;
-    right: 24px;
-    z-index: 9999;
-    font-family: 'DM Sans', -apple-system, sans-serif;
+    bottom: 28px;
+    right: 28px;
+    z-index: 99999;
+    font-family: 'DM Sans', sans-serif;
 }
 
-/* Floating Button */
+/* Floating Trigger Button (Matches Reservia .header-book-btn / creative logo aesthetic) */
 #ai-concierge-toggle {
     display: flex;
     align-items: center;
-    gap: 8px;
-    background: linear-gradient(135deg, #2b1f14, #141414);
+    gap: 10px;
+    background: #1a1008;
     color: hsl(42, 48%, 77%);
-    border: 1px solid rgba(201, 160, 80, 0.45);
-    padding: 13px 22px;
-    border-radius: 50px;
+    border: 1px solid hsl(42, 48%, 77%);
+    padding: 13px 24px;
+    border-radius: 4px;
     cursor: pointer;
-    font-size: 0.95rem;
-    font-weight: 600;
-    letter-spacing: 0.05em;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.5), 0 0 16px rgba(201,160,80,0.2);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.8), 0 0 15px rgba(201,160,80,0.25);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
 }
 
 #ai-concierge-toggle:hover {
-    transform: translateY(-3px) scale(1.03);
-    border-color: #c9a050;
-    box-shadow: 0 12px 30px rgba(0,0,0,0.6), 0 0 24px rgba(201,160,80,0.4);
-    color: #fff;
+    background: hsl(42, 48%, 77%);
+    color: #1a1008;
+    border-color: hsl(42, 48%, 77%);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(0,0,0,0.9), 0 0 25px rgba(201,160,80,0.45);
 }
 
-.ai-btn-sparkle {
-    font-size: 1.15rem;
-    color: #c9a050;
+#ai-concierge-toggle:hover .ai-btn-star path {
+    fill: #1a1008;
 }
 
 .ai-pulse-ring {
     position: absolute;
-    top: -3px;
-    left: -3px;
-    right: -3px;
-    bottom: -3px;
-    border: 1px solid rgba(201,160,80,0.3);
-    border-radius: 50px;
-    animation: ai-pulse 2.5s infinite;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    border: 1px solid rgba(201,160,80,0.4);
+    border-radius: 6px;
+    animation: ai-pulse 2.8s infinite;
     pointer-events: none;
 }
 
 @keyframes ai-pulse {
     0% { transform: scale(1); opacity: 0.8; }
-    50% { transform: scale(1.08); opacity: 0; }
+    50% { transform: scale(1.06); opacity: 0; }
     100% { transform: scale(1); opacity: 0; }
 }
 
-/* Chat Modal */
+/* Chat Modal Window */
 #ai-concierge-modal {
     position: fixed;
-    bottom: 84px;
-    right: 24px;
-    width: 420px;
-    max-width: calc(100vw - 32px);
-    height: 560px;
+    bottom: 90px;
+    right: 28px;
+    width: 440px;
+    max-width: calc(100vw - 36px);
+    height: 600px;
     max-height: calc(100vh - 120px);
-    background: #17130e;
-    border: 1px solid rgba(201, 160, 80, 0.4);
-    border-radius: 16px;
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(201, 160, 80, 0.2);
+    background: linear-gradient(180deg, #18120b 0%, #100b07 100%);
+    border: 1px solid rgba(201, 160, 80, 0.45);
+    border-radius: 8px;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.95), 0 0 35px rgba(201, 160, 80, 0.2);
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    backdrop-filter: blur(14px);
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .ai-modal-hidden {
     opacity: 0;
     pointer-events: none;
-    transform: translateY(20px) scale(0.96);
+    transform: translateY(24px) scale(0.95);
     display: none !important;
 }
 
 /* Header */
 .ai-header {
-    background: #1f1811;
-    padding: 16px 18px;
+    background: #1c140c;
+    padding: 18px 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -166,64 +174,72 @@
 .ai-avatar {
     width: 40px;
     height: 40px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #c9a050, #6e5022);
-    color: #1a1008;
+    border-radius: 4px;
+    background: #251b11;
+    border: 1px solid rgba(201, 160, 80, 0.4);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: bold;
-    font-size: 1.25rem;
 }
 
-.ai-title {
-    font-family: 'Forum', serif;
-    font-size: 1.25rem;
+.ai-brand-titles {
+    display: flex;
+    flex-direction: column;
+}
+
+.ai-brand-name {
+    font-family: 'Forum', cursive;
+    font-size: 1.45rem;
     color: #fff;
-    margin: 0;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.15em;
+    line-height: 1;
+    margin-bottom: 4px;
 }
 
-.ai-status {
-    font-size: 0.8rem;
-    color: #b5a596;
-    margin: 3px 0 0;
+.ai-brand-subtitle {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.72rem;
+    color: hsl(42, 48%, 77%);
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    line-height: 1;
     display: flex;
     align-items: center;
     gap: 6px;
 }
 
-.ai-status-dot {
-    width: 7px;
-    height: 7px;
+.ai-live-indicator {
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
     background: #4ade80;
-    display: inline-block;
     box-shadow: 0 0 8px #4ade80;
+    display: inline-block;
 }
 
 #ai-concierge-close {
     background: transparent;
     border: none;
-    color: #a89a8c;
-    font-size: 1.6rem;
+    color: hsl(42, 48%, 77%);
+    font-size: 1.8rem;
     cursor: pointer;
     line-height: 1;
     padding: 4px;
-    transition: color 0.2s;
+    transition: color 0.2s, transform 0.2s;
 }
 
 #ai-concierge-close:hover {
     color: #fff;
+    transform: scale(1.1);
 }
 
 /* Suggestion Chips */
 .ai-chips-wrapper {
     display: flex;
     gap: 8px;
-    padding: 12px 16px;
+    padding: 12px 18px;
     overflow-x: auto;
-    background: rgba(20, 15, 10, 0.7);
+    background: #140e08;
     border-bottom: 1px solid rgba(201, 160, 80, 0.15);
     scrollbar-width: none;
 }
@@ -234,12 +250,13 @@
 
 .ai-chip {
     flex-shrink: 0;
-    background: rgba(201, 160, 80, 0.12);
-    border: 1px solid rgba(201, 160, 80, 0.3);
+    background: #23190f;
+    border: 1px solid rgba(201, 160, 80, 0.35);
     color: hsl(42, 48%, 77%);
     padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 0.82rem;
+    border-radius: 3px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
@@ -247,25 +264,42 @@
 }
 
 .ai-chip:hover {
-    background: rgba(201, 160, 80, 0.3);
-    color: #fff;
-    border-color: #c9a050;
+    background: hsl(42, 48%, 77%);
+    color: #1a1008;
+    border-color: hsl(42, 48%, 77%);
 }
 
-/* Messages */
+/* Messages Container with Custom Luxury Scrollbar */
 .ai-messages {
     flex: 1;
     overflow-y: auto;
-    padding: 18px;
+    padding: 20px;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 16px;
+}
+
+.ai-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.ai-messages::-webkit-scrollbar-track {
+    background: #100b07;
+}
+
+.ai-messages::-webkit-scrollbar-thumb {
+    background: rgba(201, 160, 80, 0.4);
+    border-radius: 3px;
+}
+
+.ai-messages::-webkit-scrollbar-thumb:hover {
+    background: hsl(42, 48%, 77%);
 }
 
 .ai-msg {
     display: flex;
     flex-direction: column;
-    max-width: 88%;
+    max-width: 90%;
 }
 
 .ai-msg-bot {
@@ -277,66 +311,77 @@
 }
 
 .ai-msg-bubble {
-    padding: 13px 17px;
-    border-radius: 16px;
-    font-size: 0.98rem;
-    line-height: 1.65;
+    padding: 14px 18px;
+    border-radius: 4px;
+    font-size: 1.02rem;
+    line-height: 1.7;
     word-break: break-word;
+    font-family: 'DM Sans', sans-serif;
 }
 
 .ai-msg-bot .ai-msg-bubble {
-    background: #231b13;
-    color: #f3ece4;
-    border: 1px solid rgba(201, 160, 80, 0.22);
-    border-bottom-left-radius: 4px;
+    background: #1c140d;
+    color: #f7f3ed;
+    border: 1px solid rgba(201, 160, 80, 0.25);
+    border-left: 3px solid hsl(42, 48%, 77%);
+}
+
+.ai-msg-bot .ai-msg-bubble strong {
+    color: hsl(42, 48%, 77%);
+    font-weight: 700;
 }
 
 .ai-msg-user .ai-msg-bubble {
-    background: linear-gradient(135deg, #c9a050, #96702c);
-    color: #171008;
+    background: hsl(42, 48%, 77%);
+    color: #1a1008;
     font-weight: 600;
-    border-bottom-right-radius: 4px;
+    border: 1px solid hsl(42, 48%, 77%);
 }
 
 .ai-msg-time {
-    font-size: 0.7rem;
-    color: #8c7e70;
+    font-size: 0.72rem;
+    color: rgba(255, 255, 255, 0.4);
     margin-top: 5px;
     padding: 0 4px;
+    letter-spacing: 0.05em;
 }
 
 .ai-msg-user .ai-msg-time {
     align-self: flex-end;
+    color: hsl(42, 48%, 77%);
 }
 
+/* Call to Action Button Inside Chat */
 .ai-book-cta {
     display: inline-block;
-    margin-top: 12px;
-    background: #c9a050;
-    color: #141008 !important;
+    margin-top: 14px;
+    background: hsl(42, 48%, 77%);
+    color: #1a1008 !important;
+    font-family: 'DM Sans', sans-serif;
     font-weight: 700;
     font-size: 0.85rem;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    padding: 8px 16px;
-    border-radius: 4px;
+    letter-spacing: 0.16em;
+    padding: 10px 20px;
+    border-radius: 3px;
     text-decoration: none;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
-    transition: all 0.2s;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    transition: all 0.25s ease;
 }
 
 .ai-book-cta:hover {
     background: #fff;
-    color: #141008 !important;
-    transform: translateY(-1px);
+    color: #1a1008 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255,255,255,0.25);
 }
 
 /* Typing Indicator */
 #ai-typing-indicator {
     display: flex;
     align-items: center;
-    gap: 4px;
-    padding: 6px 18px 12px;
+    gap: 5px;
+    padding: 8px 20px 14px;
 }
 
 .ai-typing-hidden {
@@ -347,7 +392,7 @@
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: #c9a050;
+    background: hsl(42, 48%, 77%);
     animation: ai-bounce 1.4s infinite ease-in-out both;
 }
 
@@ -359,49 +404,60 @@
     40% { transform: scale(1); opacity: 1; }
 }
 
+.ai-typing-text {
+    font-size: 0.8rem;
+    color: hsl(42, 48%, 77%);
+    margin-left: 8px;
+    letter-spacing: 0.05em;
+    font-style: italic;
+}
+
 /* Input Form */
 .ai-input-form {
     display: flex;
     align-items: center;
-    padding: 12px 14px;
-    background: #1c150e;
+    padding: 14px 18px;
+    background: #18110a;
     border-top: 1px solid rgba(201, 160, 80, 0.25);
     gap: 10px;
 }
 
 #ai-user-input {
     flex: 1;
-    background: #2a2016;
-    border: 1px solid rgba(201, 160, 80, 0.35);
-    border-radius: 24px;
+    background: #251b11;
+    border: 1px solid rgba(201, 160, 80, 0.4);
+    border-radius: 3px;
     color: #fff;
-    padding: 11px 18px;
-    font-size: 0.95rem;
+    padding: 12px 18px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.98rem;
     outline: none;
-    transition: border-color 0.2s;
+    transition: all 0.2s;
 }
 
 #ai-user-input:focus {
-    border-color: #c9a050;
+    border-color: hsl(42, 48%, 77%);
+    box-shadow: 0 0 10px rgba(201, 160, 80, 0.25);
 }
 
 #ai-send-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: #c9a050;
-    color: #171008;
+    width: 44px;
+    height: 44px;
+    border-radius: 3px;
+    background: hsl(42, 48%, 77%);
+    color: #1a1008;
     border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.2s, background 0.2s;
+    transition: all 0.2s;
     flex-shrink: 0;
 }
 
 #ai-send-btn:hover {
     background: #fff;
+    color: #1a1008;
     transform: scale(1.05);
 }
 </style>
@@ -421,7 +477,10 @@
     toggleBtn.addEventListener('click', function() {
         modal.classList.toggle('ai-modal-hidden');
         if (!modal.classList.contains('ai-modal-hidden')) {
-            setTimeout(function() { input.focus(); }, 150);
+            setTimeout(function() { 
+                input.focus(); 
+                scrollToBottom();
+            }, 150);
         }
     });
 
@@ -447,11 +506,16 @@
         input.value = '';
     });
 
+    function scrollToBottom() {
+        setTimeout(function() {
+            messagesList.scrollTop = messagesList.scrollHeight;
+        }, 50);
+    }
+
     async function sendMessage(text) {
-        // Append User Message
         appendMessage('user', text);
         typing.classList.remove('ai-typing-hidden');
-        messagesList.scrollTop = messagesList.scrollHeight;
+        scrollToBottom();
 
         try {
             var res = await fetch('/api/ai/concierge', {
@@ -484,7 +548,7 @@
         wrapper.appendChild(bubble);
         wrapper.appendChild(time);
         messagesList.appendChild(wrapper);
-        messagesList.scrollTop = messagesList.scrollHeight;
+        scrollToBottom();
     }
 })();
 </script>
