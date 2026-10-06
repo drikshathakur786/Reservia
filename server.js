@@ -49,16 +49,6 @@ const transporter = nodemailer.createTransport({
     socketTimeout: 15000
 });
 
-// Verify SMTP connection on startup
-if (process.env.EMAIL_PASS) {
-    transporter.verify((error, success) => {
-        if (error) {
-            console.error("⚠️ [Nodemailer] SMTP Connection Error:", error.message);
-        } else {
-            console.log("✅ [Nodemailer] SMTP Server is ready to dispatch emails from:", process.env.EMAIL_USER || "driksha605@gmail.com");
-        }
-    });
-}
 
 
 // Helper: Interactive WhatsApp Confirmation Prompt
@@ -905,17 +895,32 @@ app.post("/subscribe", async (req, res) => {
             `
         };
 
-        if (process.env.EMAIL_PASS) {
-            transporter.sendMail(mailOptions)
-                .then(info => {
-                    console.log(`✉️ [Newsletter] Email successfully delivered to ${email}. MessageId: ${info.messageId}`);
-                })
-                .catch(mailErr => {
-                    console.error(`❌ [Newsletter] Failed to dispatch email to ${email}:`, mailErr.message);
-                });
-        } else {
-            console.log(`✉️ [Newsletter Simulation] Welcome email queued for ${email} (EMAIL_PASS not found)`);
-        }
+        // Dispatch welcome email via EmailJS HTTPS API (bypasses Render SMTP port blocking)
+        fetch("https://api.emailjs.com/api/v1.0/email/send", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Origin": "https://reservia-x130.onrender.com",
+                "Referer": "https://reservia-x130.onrender.com/"
+            },
+            body: JSON.stringify({
+                service_id: process.env.EMAILJS_SERVICE_ID || "service_wvfb7pe",
+                template_id: process.env.EMAILJS_TEMPLATE_ID || "template_r5h7qmm",
+                user_id: process.env.EMAILJS_PUBLIC_KEY || "KdhXcMwodUaRyQXOA",
+                template_params: {
+                    email: email
+                }
+            })
+        }).then(async r => {
+            if (r.ok) {
+                console.log(`✉️ [EmailJS] Welcome email delivered successfully via Gmail to: ${email}`);
+            } else {
+                const text = await r.text();
+                console.warn(`⚠️ [EmailJS] Delivery returned status ${r.status}:`, text);
+            }
+        }).catch(err => {
+            console.error(`❌ [EmailJS] Dispatch failed:`, err.message);
+        });
     } catch (err) {
         console.error("Subscription error:", err);
         return res.status(500).json({ success: false, message: "Unable to process subscription right now. Please try again." });

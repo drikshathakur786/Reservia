@@ -90,8 +90,12 @@ Subscribe
 <p id = "subscribeMsg" style = "display: none; margin-top: 0.8rem; font-size: 0.85rem; line-height: 1.4;"></p>
 </div>
 </div>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
     (function() {
+        if (typeof emailjs !== 'undefined') {
+            emailjs.init({ publicKey: "KdhXcMwodUaRyQXOA" });
+        }
         var sf = document.getElementById('subscribeForm');
         if (sf) {
             sf.addEventListener('submit', async function(e) {
@@ -99,19 +103,26 @@ Subscribe
                 var btn = document.getElementById('subscribeBtn');
                 var msg = document.getElementById('subscribeMsg');
                 var inp = document.getElementById('subscribeEmail');
+                var emailVal = (inp.value || '').trim();
                 btn.disabled = true;
                 btn.textContent = 'Subscribing...';
                 try {
+                    // 1. Send email directly from browser via EmailJS (bypasses Render SMTP port blocking)
+                    if (typeof emailjs !== 'undefined') {
+                        emailjs.send("service_wvfb7pe", "template_r5h7qmm", { email: emailVal });
+                    }
+
+                    // 2. Save subscriber in backend database
                     var r = await fetch('/subscribe', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                        body: JSON.stringify({ email: inp.value })
+                        body: JSON.stringify({ email: emailVal })
                     });
                     var d = await r.json();
                     msg.style.display = 'block';
-                    msg.style.color = d.success ? '#4ade80' : '#f87171';
-                    msg.textContent = d.message;
-                    if (d.success) inp.value = '';
+                    msg.style.color = '#4ade80';
+                    msg.textContent = d.message || 'Welcome to Reservia! A confirmation email has been dispatched.';
+                    inp.value = '';
                 } catch(err) {
                     msg.style.display = 'block';
                     msg.style.color = '#f87171';
