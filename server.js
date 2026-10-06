@@ -975,11 +975,35 @@ Keep responses concise, elegant (2-4 paragraphs max), and beautifully formatted.
         }
     }
 
-    // 2. Intelligent Built-in Hospitality Knowledge Engine (Zero-Key Guaranteed Response)
+    // 2. Intelligent Hospitality Knowledge Engine (Zero-Key Guaranteed Response)
     let reply = "";
 
+    // "What is Reservia" / "What do you know about Reservia" / "About Reservia" / "Who are you"
+    if (lower.includes("what is reservia") || lower.includes("know about reservia") || lower.includes("about reservia") || lower.includes("tell me about reservia") || lower.includes("who are you") || lower.includes("what are you") || lower.includes("what's reservia")) {
+        reply = `<strong>Reservia</strong> is an exclusive culinary sanctuary where European haute cuisine meets modern hospitality excellence.<br><br>Born from a deep reverence for classical French techniques and Italian artisanal heritage, we feature wood-fired dry-aged meats, handcrafted truffle pastas, and an award-winning cellar housing over 350 curated vintages.<br><br>Every table reservation is guaranteed in real-time with zero double-booking, personalized acoustic ambiances, and attentive concierge care.<br><br>Would you like to explore our tasting menus or reserve an intimate table?<br><br><a href="/reservation" class="ai-book-cta">Reserve Your Reservia Experience →</a>`;
+    }
+    // "I am hungry" / "Starving" / "Food" / "What should I eat" / "Cravings"
+    else if (lower.includes("hungry") || lower.includes("starving") || lower.includes("eat") || lower.includes("craving") || lower.includes("food") || lower.includes("dinner")) {
+        reply = `Say no more — allow me to tempt your palate! <br><br>If you crave something rich and decadent, our <strong>Handcrafted Black Truffle Tagliolini</strong> tossed in aged Parmigiano-Reggiano butter is pure bliss. If you're in the mood for a hearty cut, our 45-day dry-aged <strong>Prime Ribeye</strong> with rosemary bone-marrow jus never fails.<br><br>Prefer delicate seafood? Our pan-roasted <strong>Chilean Sea Bass</strong> in saffron velouté melts like velvet.<br><br>Shall I secure a table for you so dinner is ready upon your arrival?<br><br><a href="/reservation" class="ai-book-cta">Reserve Your Table Now →</a>`;
+    }
+    // Greetings: "Hi", "Hello", "Hey", "Good evening"
+    else if (lower === "hi" || lower === "hello" || lower === "hey" || lower.startsWith("hi ") || lower.startsWith("hello ") || lower.startsWith("hey ") || lower.includes("good evening") || lower.includes("good afternoon") || lower.includes("good morning")) {
+        reply = `Good evening and a very warm welcome! It is an absolute pleasure to assist you at Reservia.<br><br>How may I delight your dining plans today? Whether you would like vintage wine pairing advice, a curated 3-course celebration plan, or immediate table reservation, consider it done.<br><br><a href="/reservation" class="ai-book-cta">Explore Available Tables →</a>`;
+    }
+    // "Who made you" / "Who created you" / "Driksha"
+    else if (lower.includes("who made you") || lower.includes("who created") || lower.includes("developer") || lower.includes("creator") || lower.includes("driksha")) {
+        reply = `Reservia was designed, engineered, and brought to life by <strong>Driksha Thakur</strong> — harmonizing Michelin-level culinary aesthetics with full-stack real-time booking engineering, WhatsApp floor automation, and conversational AI concierge intelligence!`;
+    }
+    // Chef Recommendations / Special / Best Dishes
+    else if (lower.includes("recommend") || lower.includes("special") || lower.includes("best dish") || lower.includes("signature") || lower.includes("must try") || lower.includes("menu")) {
+        reply = `Allow me to present our <strong>Chef's Signature Trilogy</strong> — the definitive Reservia experience:<br><br>1. <em>L'Entrée:</em> <strong>Osetra Caviar &amp; Burrata Tartlet</strong> with Meyer lemon emulsion.<br>2. <em>Il Primo:</em> <strong>Black Truffle Hand-Rolled Agnolotti</strong> with cultured alpine butter.<br>3. <em>Il Secondo:</em> <strong>Wood-Fired Prime Ribeye</strong> or <strong>Chilean Sea Bass</strong> in saffron bouillon.<br>4. <em>Dolce:</em> <strong>Molten Valrhona Chocolate Fondant</strong> with bourbon vanilla bean gelato.<br><br>Our sommelier pairs each course with exquisite vintage wines.<br><br><a href="/reservation" class="ai-book-cta">Book The Signature Experience →</a>`;
+    }
+    // Pricing / Cost / How expensive
+    else if (lower.includes("cost") || lower.includes("price") || lower.includes("expensive") || lower.includes("budget") || lower.includes("how much") || lower.includes("rates")) {
+        reply = `Our multi-course culinary tasting journeys range from <strong>₹2,500 to ₹4,800 ($35 – $65)</strong> per guest, with optional sommelier wine flight pairings. We also offer a flexible à la carte selection during both lunch and dinner services.<br><br>Every booking includes complimentary amuse-bouche from the chef and personalized table concierge care.<br><br><a href="/reservation" class="ai-book-cta">View Reservations &amp; Availability →</a>`;
+    }
     // Wine & Beverage Pairings
-    if (lower.includes("wine") || lower.includes("pair") || lower.includes("drink") || lower.includes("sommelier") || lower.includes("cocktail") || lower.includes("champagne")) {
+    else if (lower.includes("wine") || lower.includes("pair") || lower.includes("drink") || lower.includes("sommelier") || lower.includes("cocktail") || lower.includes("champagne") || lower.includes("alcohol") || lower.includes("beer") || lower.includes("whiskey")) {
         if (lower.includes("steak") || lower.includes("meat") || lower.includes("beef") || lower.includes("ribeye") || lower.includes("wagyu")) {
             reply = `For our prime dry-aged steaks and beef cuts, I warmly recommend a robust <strong>2018 Bordeaux Grand Cru</strong> or a bold <strong>Napa Valley Cabernet Sauvignon</strong>. Their deep tannins and notes of dark cassis cut through the rich marbling effortlessly.<br><br>Prefer an Italian vintage? A bottle of <strong>Barolo DOCG</strong> will elevate the dish exquisitely.<br><br><a href="/reservation" class="ai-book-cta">Book Your Table Experience →</a>`;
         } else if (lower.includes("salmon") || lower.includes("fish") || lower.includes("seafood") || lower.includes("lobster")) {
@@ -991,11 +1015,11 @@ Keep responses concise, elegant (2-4 paragraphs max), and beautifully formatted.
         }
     }
     // Romantic / Anniversary / Date Night Planning
-    else if (lower.includes("anniversary") || lower.includes("romantic") || lower.includes("date") || lower.includes("proposal") || lower.includes("birthday")) {
+    else if (lower.includes("anniversary") || lower.includes("romantic") || lower.includes("date") || lower.includes("proposal") || lower.includes("birthday") || lower.includes("celebrat")) {
         reply = `Happy upcoming celebration! For an unforgettable romantic evening, allow us to reserve one of our <strong>candlelit alcove booths</strong> with soft acoustic ambiance.<br><br><strong>Chef's Recommended 3-Course Celebration:</strong><br>1. <em>Amuse-Bouche:</em> Osetra Caviar Tartlet with Brut Champagne.<br>2. <em>Primi:</em> Black Truffle Handcrafted Tagliolini.<br>3. <em>Secondi:</em> Prime Ribeye or Chilean Sea Bass with seasonal reductions.<br>4. <em>Dessert:</em> Valrhona Chocolate Fondant with personalized gold dusting.<br><br><a href="/reservation" class="ai-book-cta">Reserve Your Romantic Table →</a>`;
     }
     // Vegetarian / Vegan / Dietary & Allergens
-    else if (lower.includes("vegan") || lower.includes("vegetarian") || lower.includes("gluten") || lower.includes("allergy") || lower.includes("allergic") || lower.includes("halal")) {
+    else if (lower.includes("vegan") || lower.includes("vegetarian") || lower.includes("gluten") || lower.includes("allergy") || lower.includes("allergic") || lower.includes("halal") || lower.includes("diet")) {
         reply = `At Reservia, we celebrate bespoke dietary hospitality. Our Executive Chef curates a dedicated <strong>Plant-Based Tasting Menu</strong> featuring:<br><br>• <em>Roasted Heritage Beetroot Carpaccio</em> with citrus pearls and hazelnut emulsion.<br>• <em>Artichoke &amp; Morel Mushroom Risotto</em> (100% dairy-free &amp; gluten-free).<br>• <em>Wild Berry Pavlova</em> with coconut crème chantilly.<br><br><em>Notice:</em> Our kitchen follows strict cross-contamination protocols. Please add any allergen notes when booking your reservation.<br><br><a href="/reservation" class="ai-book-cta">Book with Dietary Preferences →</a>`;
     }
     // Timings, Hours & Location
@@ -1003,7 +1027,7 @@ Keep responses concise, elegant (2-4 paragraphs max), and beautifully formatted.
         reply = `Reservia welcomes guests seven days a week at <strong>123 Culinary Avenue, Food City</strong>.<br><br><strong>Operating Hours:</strong><br>• <strong>Lunch Service:</strong> 12:00 PM – 3:30 PM<br>• <strong>Dinner Service:</strong> 6:30 PM – 11:00 PM<br><br>For prime dinner seatings (7:30 PM – 9:00 PM), advance reservations are strongly recommended to guarantee real-time table allocation.<br><br><a href="/reservation" class="ai-book-cta">Reserve Your Slot Online →</a>`;
     }
     // General Booking / Reservation inquiries
-    else if (lower.includes("book") || lower.includes("reserv") || lower.includes("table") || lower.includes("seat") || lower.includes("cost") || lower.includes("price")) {
+    else if (lower.includes("book") || lower.includes("reserv") || lower.includes("table") || lower.includes("seat")) {
         reply = `Reserving a table at Reservia is seamless. Our live booking system guarantees zero double-booking with atomic real-time allocation, flexible time slots, and instant WhatsApp confirmation.<br><br>You can select your party size, preferred ambiance (Classical, Jazz, Ambient), and special dining notes in under a minute.<br><br><a href="/reservation" class="ai-book-cta">Reserve Your Table Now →</a>`;
     }
     // Default refined concierge response
