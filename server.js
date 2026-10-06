@@ -927,6 +927,93 @@ app.post("/subscribe", async (req, res) => {
     }
 });
 
+// AI Sommelier & Concierge Endpoint
+app.post("/api/ai/concierge", async (req, res) => {
+    const userMessage = (req.body.message || "").trim();
+    if (!userMessage) {
+        return res.json({ reply: "Pardon me, how may I assist your dining experience today?" });
+    }
+
+    const lower = userMessage.toLowerCase();
+
+    // 1. External LLM check (Groq / Gemini / OpenAI) if key provided in env
+    if (process.env.GROQ_API_KEY) {
+        try {
+            const groqRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${process.env.GROQ_API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: "llama-3.3-70b-versatile",
+                    messages: [
+                        {
+                            role: "system",
+                            content: `You are the Head Sommelier and Executive Maitre D' at 'Reservia' — an ultra-luxury fine dining restaurant.
+Tone: Warm, sophisticated, poetic, hospitable, and refined.
+Restaurant Details:
+- Address: 123 Culinary Avenue, Food City
+- Hours: Lunch 12:00 PM – 3:30 PM | Dinner 6:30 PM – 11:00 PM
+- Cuisine: Modern French & Italian Haute Cuisine, artisanal pastas, dry-aged steaks, sea bass, truffle delicacies.
+- Booking Link: If relevant, invite them to reserve a table with <a href="/reservation" class="ai-book-cta">Reserve Your Table</a>.
+Keep responses concise, elegant (2-4 paragraphs max), and beautifully formatted.`
+                        },
+                        { role: "user", content: userMessage }
+                    ],
+                    max_tokens: 450,
+                    temperature: 0.7
+                })
+            });
+            if (groqRes.ok) {
+                const groqData = await groqRes.json();
+                const reply = groqData.choices?.[0]?.message?.content;
+                if (reply) return res.json({ reply });
+            }
+        } catch (llmErr) {
+            console.warn("LLM API fallback to internal concierge engine:", llmErr.message);
+        }
+    }
+
+    // 2. Intelligent Built-in Hospitality Knowledge Engine (Zero-Key Guaranteed Response)
+    let reply = "";
+
+    // Wine & Beverage Pairings
+    if (lower.includes("wine") || lower.includes("pair") || lower.includes("drink") || lower.includes("sommelier") || lower.includes("cocktail") || lower.includes("champagne")) {
+        if (lower.includes("steak") || lower.includes("meat") || lower.includes("beef") || lower.includes("ribeye") || lower.includes("wagyu")) {
+            reply = `For our prime dry-aged steaks and beef cuts, I warmly recommend a robust <strong>2018 Bordeaux Grand Cru</strong> or a bold <strong>Napa Valley Cabernet Sauvignon</strong>. Their deep tannins and notes of dark cassis cut through the rich marbling effortlessly.<br><br>Prefer an Italian vintage? A bottle of <strong>Barolo DOCG</strong> will elevate the dish exquisitely.<br><br><a href="/reservation" class="ai-book-cta">Book Your Table Experience →</a>`;
+        } else if (lower.includes("salmon") || lower.includes("fish") || lower.includes("seafood") || lower.includes("lobster")) {
+            reply = `For seafood and pan-seared wild salmon, nothing compares to a crisp, mineral-forward <strong>Domaine Chablis Premier Cru</strong> or a vibrant <strong>Sancerre from the Loire Valley</strong>.<br><br>Their vibrant acidity and citrus blossom finish accentuate the delicate oceanic flavors without overpowering them.<br><br><a href="/reservation" class="ai-book-cta">Reserve Your Seafood Dinner →</a>`;
+        } else if (lower.includes("pasta") || lower.includes("truffle") || lower.includes("risotto")) {
+            reply = `Ah, our signature black truffle tagliolini! Truffle demands an earthy, aromatic companion — a vintage <strong>Piedmontese Nebbiolo</strong> or a classic <strong>Burgundian Pinot Noir</strong> is perfection. The velvety forest-floor aromas harmonize with the truffle's decadence.<br><br><a href="/reservation" class="ai-book-cta">Reserve for Truffle Night →</a>`;
+        } else {
+            reply = `Our cellar houses over 350 hand-curated Old and New World vintages.<br><br>• <strong>Reds:</strong> Full-bodied Barolo, Brunello di Montalcino, and Margaux.<br>• <strong>Whites:</strong> Crisp Chablis, Pouilly-Fumé, and Puligny-Montrachet.<br>• <strong>Sparkling:</strong> Vintage Dom Pérignon and artisanal grower Champagnes.<br><br>Tell me what entree you have in mind, and I shall select the ideal vintage!<br><br><a href="/reservation" class="ai-book-cta">Reserve a Sommelier Table →</a>`;
+        }
+    }
+    // Romantic / Anniversary / Date Night Planning
+    else if (lower.includes("anniversary") || lower.includes("romantic") || lower.includes("date") || lower.includes("proposal") || lower.includes("birthday")) {
+        reply = `Happy upcoming celebration! For an unforgettable romantic evening, allow us to reserve one of our <strong>candlelit alcove booths</strong> with soft acoustic ambiance.<br><br><strong>Chef's Recommended 3-Course Celebration:</strong><br>1. <em>Amuse-Bouche:</em> Osetra Caviar Tartlet with Brut Champagne.<br>2. <em>Primi:</em> Black Truffle Handcrafted Tagliolini.<br>3. <em>Secondi:</em> Prime Ribeye or Chilean Sea Bass with seasonal reductions.<br>4. <em>Dessert:</em> Valrhona Chocolate Fondant with personalized gold dusting.<br><br><a href="/reservation" class="ai-book-cta">Reserve Your Romantic Table →</a>`;
+    }
+    // Vegetarian / Vegan / Dietary & Allergens
+    else if (lower.includes("vegan") || lower.includes("vegetarian") || lower.includes("gluten") || lower.includes("allergy") || lower.includes("allergic") || lower.includes("halal")) {
+        reply = `At Reservia, we celebrate bespoke dietary hospitality. Our Executive Chef curates a dedicated <strong>Plant-Based Tasting Menu</strong> featuring:<br><br>• <em>Roasted Heritage Beetroot Carpaccio</em> with citrus pearls and hazelnut emulsion.<br>• <em>Artichoke &amp; Morel Mushroom Risotto</em> (100% dairy-free &amp; gluten-free).<br>• <em>Wild Berry Pavlova</em> with coconut crème chantilly.<br><br><em>Notice:</em> Our kitchen follows strict cross-contamination protocols. Please add any allergen notes when booking your reservation.<br><br><a href="/reservation" class="ai-book-cta">Book with Dietary Preferences →</a>`;
+    }
+    // Timings, Hours & Location
+    else if (lower.includes("hour") || lower.includes("time") || lower.includes("open") || lower.includes("close") || lower.includes("when") || lower.includes("address") || lower.includes("location") || lower.includes("where")) {
+        reply = `Reservia welcomes guests seven days a week at <strong>123 Culinary Avenue, Food City</strong>.<br><br><strong>Operating Hours:</strong><br>• <strong>Lunch Service:</strong> 12:00 PM – 3:30 PM<br>• <strong>Dinner Service:</strong> 6:30 PM – 11:00 PM<br><br>For prime dinner seatings (7:30 PM – 9:00 PM), advance reservations are strongly recommended to guarantee real-time table allocation.<br><br><a href="/reservation" class="ai-book-cta">Reserve Your Slot Online →</a>`;
+    }
+    // General Booking / Reservation inquiries
+    else if (lower.includes("book") || lower.includes("reserv") || lower.includes("table") || lower.includes("seat") || lower.includes("cost") || lower.includes("price")) {
+        reply = `Reserving a table at Reservia is seamless. Our live booking system guarantees zero double-booking with atomic real-time allocation, flexible time slots, and instant WhatsApp confirmation.<br><br>You can select your party size, preferred ambiance (Classical, Jazz, Ambient), and special dining notes in under a minute.<br><br><a href="/reservation" class="ai-book-cta">Reserve Your Table Now →</a>`;
+    }
+    // Default refined concierge response
+    else {
+        reply = `Thank you for consulting Reservia Concierge. Whether you are seeking a rare vintage wine pairing, curating an intimate multi-course celebration, or planning a business dinner, our team is at your complete disposal.<br><br>You may explore our curated restaurants, review our seasonal menu highlights, or guarantee your table directly online.<br><br><a href="/reservation" class="ai-book-cta">Reserve A Table Online →</a>`;
+    }
+
+    return res.json({ reply });
+});
+
 // 404 handler — must be last
 app.use((req, res) => {
     res.status(404).render("index", {

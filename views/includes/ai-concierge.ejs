@@ -1,0 +1,488 @@
+<!-- Reservia AI Sommelier & Concierge Floating Widget -->
+<div id="ai-concierge-container">
+    <!-- Floating Trigger Button -->
+    <button id="ai-concierge-toggle" aria-label="Open AI Concierge">
+        <span class="ai-btn-sparkle">✦</span>
+        <span class="ai-btn-text">Ask AI Concierge</span>
+        <span class="ai-pulse-ring"></span>
+    </button>
+
+    <!-- Chat Modal Window -->
+    <div id="ai-concierge-modal" class="ai-modal-hidden">
+        <!-- Header -->
+        <div class="ai-header">
+            <div class="ai-header-info">
+                <div class="ai-avatar">✦</div>
+                <div>
+                    <h3 class="ai-title">Reservia Concierge</h3>
+                    <p class="ai-status"><span class="ai-status-dot"></span> AI Sommelier &amp; Host</p>
+                </div>
+            </div>
+            <button id="ai-concierge-close" aria-label="Close Chat">&times;</button>
+        </div>
+
+        <!-- Suggestion Chips -->
+        <div class="ai-chips-wrapper">
+            <button class="ai-chip" data-prompt="What wine pairs best with steak or pasta?">🍷 Wine Pairings</button>
+            <button class="ai-chip" data-prompt="Plan a romantic 3-course anniversary dinner for 2.">🕯️ Anniversary Plan</button>
+            <button class="ai-chip" data-prompt="What are your vegetarian and gluten-free options?">🥗 Vegan &amp; Dietary</button>
+            <button class="ai-chip" data-prompt="What are your operating hours and best reservation times?">⏰ Booking Slots</button>
+        </div>
+
+        <!-- Message History -->
+        <div class="ai-messages" id="ai-messages-list">
+            <div class="ai-msg ai-msg-bot">
+                <div class="ai-msg-bubble">
+                    Welcome to <strong>Reservia</strong>. I am your personal <strong>AI Sommelier &amp; Concierge</strong>.
+                    <br><br>
+                    How may I curate your dining experience today? I can suggest exquisite wine pairings, tailor multi-course tasting menus, or guide your table reservation.
+                </div>
+                <span class="ai-msg-time">Just now</span>
+            </div>
+        </div>
+
+        <!-- Typing Indicator -->
+        <div id="ai-typing-indicator" class="ai-typing-hidden">
+            <div class="ai-dot"></div>
+            <div class="ai-dot"></div>
+            <div class="ai-dot"></div>
+            <span style="font-size: 0.75rem; color: #a89a8c; margin-left: 6px;">Sommelier is curating...</span>
+        </div>
+
+        <!-- Input Area -->
+        <form id="ai-chat-form" class="ai-input-form">
+            <input type="text" id="ai-user-input" placeholder="Ask about wine pairings, menus, occasions..." autocomplete="off" required>
+            <button type="submit" id="ai-send-btn" aria-label="Send message">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </form>
+    </div>
+</div>
+
+<style>
+#ai-concierge-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9999;
+    font-family: 'DM Sans', -apple-system, sans-serif;
+}
+
+/* Floating Button */
+#ai-concierge-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #2b1f14, #141414);
+    color: hsl(42, 48%, 77%);
+    border: 1px solid rgba(201, 160, 80, 0.45);
+    padding: 12px 20px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5), 0 0 16px rgba(201,160,80,0.2);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+#ai-concierge-toggle:hover {
+    transform: translateY(-3px) scale(1.03);
+    border-color: #c9a050;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.6), 0 0 24px rgba(201,160,80,0.4);
+    color: #fff;
+}
+
+.ai-btn-sparkle {
+    font-size: 1.1rem;
+    color: #c9a050;
+}
+
+.ai-pulse-ring {
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    border: 1px solid rgba(201,160,80,0.3);
+    border-radius: 50px;
+    animation: ai-pulse 2.5s infinite;
+    pointer-events: none;
+}
+
+@keyframes ai-pulse {
+    0% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.08); opacity: 0; }
+    100% { transform: scale(1); opacity: 0; }
+}
+
+/* Chat Modal */
+#ai-concierge-modal {
+    position: fixed;
+    bottom: 84px;
+    right: 24px;
+    width: 375px;
+    max-width: calc(100vw - 32px);
+    height: 520px;
+    max-height: calc(100vh - 120px);
+    background: #17130e;
+    border: 1px solid rgba(201, 160, 80, 0.35);
+    border-radius: 16px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(201, 160, 80, 0.15);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(12px);
+}
+
+.ai-modal-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(20px) scale(0.96);
+    display: none !important;
+}
+
+/* Header */
+.ai-header {
+    background: #1f1811;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(201, 160, 80, 0.2);
+}
+
+.ai-header-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ai-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #c9a050, #6e5022);
+    color: #1a1008;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.ai-title {
+    font-family: 'Forum', serif;
+    font-size: 1.15rem;
+    color: #fff;
+    margin: 0;
+    letter-spacing: 0.05em;
+}
+
+.ai-status {
+    font-size: 0.72rem;
+    color: #a89a8c;
+    margin: 2px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.ai-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #4ade80;
+    display: inline-block;
+    box-shadow: 0 0 6px #4ade80;
+}
+
+#ai-concierge-close {
+    background: transparent;
+    border: none;
+    color: #a89a8c;
+    font-size: 1.5rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 4px;
+    transition: color 0.2s;
+}
+
+#ai-concierge-close:hover {
+    color: #fff;
+}
+
+/* Suggestion Chips */
+.ai-chips-wrapper {
+    display: flex;
+    gap: 6px;
+    padding: 10px 14px;
+    overflow-x: auto;
+    background: rgba(20, 15, 10, 0.6);
+    border-bottom: 1px solid rgba(201, 160, 80, 0.12);
+    scrollbar-width: none;
+}
+
+.ai-chips-wrapper::-webkit-scrollbar {
+    display: none;
+}
+
+.ai-chip {
+    flex-shrink: 0;
+    background: rgba(201, 160, 80, 0.1);
+    border: 1px solid rgba(201, 160, 80, 0.25);
+    color: hsl(42, 48%, 77%);
+    padding: 5px 11px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.ai-chip:hover {
+    background: rgba(201, 160, 80, 0.25);
+    color: #fff;
+    border-color: #c9a050;
+}
+
+/* Messages */
+.ai-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.ai-msg {
+    display: flex;
+    flex-direction: column;
+    max-width: 86%;
+}
+
+.ai-msg-bot {
+    align-self: flex-start;
+}
+
+.ai-msg-user {
+    align-self: flex-end;
+}
+
+.ai-msg-bubble {
+    padding: 11px 15px;
+    border-radius: 14px;
+    font-size: 0.88rem;
+    line-height: 1.55;
+    word-break: break-word;
+}
+
+.ai-msg-bot .ai-msg-bubble {
+    background: #231b13;
+    color: #e8ded4;
+    border: 1px solid rgba(201, 160, 80, 0.2);
+    border-bottom-left-radius: 3px;
+}
+
+.ai-msg-user .ai-msg-bubble {
+    background: linear-gradient(135deg, #c9a050, #96702c);
+    color: #171008;
+    font-weight: 500;
+    border-bottom-right-radius: 3px;
+}
+
+.ai-msg-time {
+    font-size: 0.65rem;
+    color: #7d7063;
+    margin-top: 4px;
+    padding: 0 4px;
+}
+
+.ai-msg-user .ai-msg-time {
+    align-self: flex-end;
+}
+
+.ai-book-cta {
+    display: inline-block;
+    margin-top: 10px;
+    background: #c9a050;
+    color: #141008 !important;
+    font-weight: 700;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 6px 14px;
+    border-radius: 4px;
+    text-decoration: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    transition: background 0.2s;
+}
+
+.ai-book-cta:hover {
+    background: #fff;
+    color: #141008 !important;
+}
+
+/* Typing Indicator */
+#ai-typing-indicator {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 16px 10px;
+}
+
+.ai-typing-hidden {
+    display: none !important;
+}
+
+.ai-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #c9a050;
+    animation: ai-bounce 1.4s infinite ease-in-out both;
+}
+
+.ai-dot:nth-child(1) { animation-delay: -0.32s; }
+.ai-dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes ai-bounce {
+    0%, 80%, 100% { transform: scale(0); opacity: 0.3; }
+    40% { transform: scale(1); opacity: 1; }
+}
+
+/* Input Form */
+.ai-input-form {
+    display: flex;
+    align-items: center;
+    padding: 10px 12px;
+    background: #1c150e;
+    border-top: 1px solid rgba(201, 160, 80, 0.2);
+    gap: 8px;
+}
+
+#ai-user-input {
+    flex: 1;
+    background: #2a2016;
+    border: 1px solid rgba(201, 160, 80, 0.3);
+    border-radius: 24px;
+    color: #fff;
+    padding: 9px 16px;
+    font-size: 0.88rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+#ai-user-input:focus {
+    border-color: #c9a050;
+}
+
+#ai-send-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #c9a050;
+    color: #171008;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s, background 0.2s;
+    flex-shrink: 0;
+}
+
+#ai-send-btn:hover {
+    background: #fff;
+    transform: scale(1.05);
+}
+</style>
+
+<script>
+(function() {
+    var toggleBtn = document.getElementById('ai-concierge-toggle');
+    var modal = document.getElementById('ai-concierge-modal');
+    var closeBtn = document.getElementById('ai-concierge-close');
+    var form = document.getElementById('ai-chat-form');
+    var input = document.getElementById('ai-user-input');
+    var messagesList = document.getElementById('ai-messages-list');
+    var typing = document.getElementById('ai-typing-indicator');
+
+    if (!toggleBtn || !modal) return;
+
+    toggleBtn.addEventListener('click', function() {
+        modal.classList.toggle('ai-modal-hidden');
+        if (!modal.classList.contains('ai-modal-hidden')) {
+            setTimeout(function() { input.focus(); }, 150);
+        }
+    });
+
+    closeBtn.addEventListener('click', function() {
+        modal.classList.add('ai-modal-hidden');
+    });
+
+    // Chip triggers
+    document.querySelectorAll('.ai-chip').forEach(function(chip) {
+        chip.addEventListener('click', function() {
+            var prompt = chip.getAttribute('data-prompt');
+            if (prompt) {
+                sendMessage(prompt);
+            }
+        });
+    });
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var txt = input.value.trim();
+        if (!txt) return;
+        sendMessage(txt);
+        input.value = '';
+    });
+
+    async function sendMessage(text) {
+        // Append User Message
+        appendMessage('user', text);
+        typing.classList.remove('ai-typing-hidden');
+        messagesList.scrollTop = messagesList.scrollHeight;
+
+        try {
+            var res = await fetch('/api/ai/concierge', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: text })
+            });
+            var data = await res.json();
+            typing.classList.add('ai-typing-hidden');
+            appendMessage('bot', data.reply);
+        } catch(err) {
+            typing.classList.add('ai-typing-hidden');
+            appendMessage('bot', "Our sommeliers are at your service! For reservations and inquiries, please visit our <a href='/reservation' class='ai-book-cta'>Reservations Page</a> or call <strong>+91 98765 43210</strong>.");
+        }
+    }
+
+    function appendMessage(sender, htmlContent) {
+        var wrapper = document.createElement('div');
+        wrapper.className = 'ai-msg ai-msg-' + sender;
+        
+        var bubble = document.createElement('div');
+        bubble.className = 'ai-msg-bubble';
+        bubble.innerHTML = htmlContent;
+
+        var time = document.createElement('span');
+        time.className = 'ai-msg-time';
+        var d = new Date();
+        time.textContent = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        wrapper.appendChild(bubble);
+        wrapper.appendChild(time);
+        messagesList.appendChild(wrapper);
+        messagesList.scrollTop = messagesList.scrollHeight;
+    }
+})();
+</script>

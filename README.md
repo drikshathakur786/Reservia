@@ -34,6 +34,13 @@ Guests can subscribe to the Reservia culinary circle directly from the footer. B
 * **Automated Welcome Email:** Instantly triggers an authentic confirmation and fine-dining welcome invitation directly from `driksha605@gmail.com`.
 * **Database Persistence:** Subscriptions are validated and stored in MongoDB under the `Subscriber` collection.
 
+### AI Sommelier & Culinary Concierge 🍷
+An intelligent, glassmorphic floating concierge widget available across all pages (`views/includes/ai-concierge.ejs`):
+* **Bespoke Wine Pairings:** Recommends Old & New World vintages (Barolo, Burgundy Pinot Noir, Chablis, Napa Valley Cabernet) tailored to cuts of meat, seafood, and artisanal pasta.
+* **Celebration & Itinerary Planning:** Plans romantic 3-course anniversary dinners with candlelit alcove booth placement and champagne welcomes.
+* **Dietary & Allergen Guidance:** Curates plant-based tasting menus and gluten-sensitive dining options with kitchen cross-contamination protocols.
+* **Zero-Key Guaranteed Execution:** Powered by a built-in hospitality knowledge engine with seamless optional LLM enhancement via `POST /api/ai/concierge`.
+
 ### Role-Based Admin Command Center & Floor Operations 📊
 Admins get a dedicated B2B operations dashboard (`/admin`) to monitor business vitals in real time — total registered users, overall booking volume, live-calculated revenue (per guest cover), and latest reservation telemetry. Managers have direct floor controls:
 * **Seat Guest:** Instantly updates booking to completed upon arrival.
@@ -123,6 +130,7 @@ Reservia/
 | `GET` | `/about` | Culinary story and kitchen heritage | Public |
 | `GET` | `/contact` | Concierge & guest inquiry form | Public |
 | `POST` | `/subscribe` | Newsletter signup & welcome email dispatch (Dual EmailJS/Nodemailer) | Public |
+| `POST` | `/api/ai/concierge` | AI Sommelier & fine-dining virtual concierge assistant | Public |
 | `POST` | `/sign-up` | Registers new user with input validation & BCrypt hashing | Public (Rate Limited) |
 | `POST` | `/login` | Authenticates user credentials & creates Mongo session | Public (Rate Limited) |
 | `GET` | `/logout` | Destroys active session & clears cookies | Authenticated |
