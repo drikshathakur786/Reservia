@@ -21,12 +21,18 @@ Reservia is the sweet spot — delivering a luxury, custom-tailored dining exper
 ## What It Does
 
 ### Smart Reservations & Concurrency Protection ⚡
-Users can book tables in real time across multiple restaurants with flexible scheduling (lunch, high tea, prime dinner, or custom minute selection) and standard Indian mobile formatting (`🇮🇳 +91`). During high-traffic booking surges, an atomic table allocation loop backed by MongoDB compound unique indexes (`restaurant`, `date`, `time`, `tableNumber`) strictly prevents race conditions and overbooking. Past dates and times are rejected automatically, and a 3-active-reservation cap prevents spam.
+Users can book tables in real time across multiple restaurants with flexible scheduling (lunch, high tea, prime dinner, or custom minute selection) and standard Indian mobile formatting (`🇮🇳 +91`). During high-traffic booking surges, an atomic table allocation loop backed by MongoDB compound unique indexes (`restaurant`, `date`, `time`, `tableNumber`) strictly prevents race conditions and overbooking. Past dates and times are rejected automatically, and a 3-active-reservation cap prevents spam. The entire booking journey is unified into a production-grade `/reservation` engine.
 
 ### Automated WhatsApp Reconfirmation & Two-Way Webhook 📲
 To eliminate the classic industry "no-show" problem without demanding friction-heavy upfront credit card deposits, a background worker runs every 15 minutes checking for bookings coming up in the next 2 hours. It dispatches interactive WhatsApp confirmation prompts. A dedicated two-way webhook (`POST /webhook/whatsapp`) listens for customer responses:
 * **Reply 1 or CONFIRM:** Confirms patron arrival status in real time.
 * **Reply 2 or CANCEL:** Automatically cancels the booking with zero penalty and immediately releases the table back into the available pool for walk-in or waitlisted diners!
+
+### Luxury Newsletter & Welcome Privilege Dispatch ✉️
+Guests can subscribe to the Reservia culinary circle directly from the footer. Built with a dual-dispatch cloud architecture:
+* **EmailJS Browser SDK + HTTPS REST API:** Bypasses cloud egress firewall restrictions (such as Render Free Tier SMTP port blocks) by transmitting over HTTPS (Port 443).
+* **Automated Welcome Email:** Instantly triggers an authentic confirmation and fine-dining welcome invitation directly from `driksha605@gmail.com`.
+* **Database Persistence:** Subscriptions are validated and stored in MongoDB under the `Subscriber` collection.
 
 ### Role-Based Admin Command Center & Floor Operations 📊
 Admins get a dedicated B2B operations dashboard (`/admin`) to monitor business vitals in real time — total registered users, overall booking volume, live-calculated revenue (per guest cover), and latest reservation telemetry. Managers have direct floor controls:
@@ -52,7 +58,7 @@ Built with zero shortcuts: brute-force mitigation on auth routes via `express-ra
 | **Backend** | Node.js (ES6+), Express 5, Mongoose (ODM), node-cron |
 | **Frontend** | EJS (Embedded JavaScript Templates), Vanilla JavaScript, CSS3 |
 | **Database** | MongoDB Atlas & Connect-Mongo (persistent session store) |
-| **Messaging & Webhooks**| WhatsApp Cloud API / Webhook integration (2-way reconfirmation & table release) |
+| **Messaging & Notifications**| WhatsApp Cloud API / Webhook & EmailJS / Nodemailer (HTTPS & SMTP dual-engine) |
 | **Security & Auth** | Express Session, BCrypt, Helmet, Express Rate Limit, Express Validator |
 | **Testing & CI** | Jest, Supertest, MongoMemoryServer, GitHub Actions CI |
 | **Hosting** | Render (Web Service) · MongoDB Atlas (Cloud Database) |
@@ -66,12 +72,12 @@ Built with zero shortcuts: brute-force mitigation on auth routes via `express-ra
 │   Client UI      │ ←──────────────────────→ │   Express 5 Server   │ ←────────────────→ │  MongoDB Atlas   │
 │  (EJS / CSS)     │   Cookie-Based Session   │   (Render Web Svc)   │   Connection Pool  │ (Cloud Database) │
 └──────────────────┘                          └──────────────────────┘                    └──────────────────┘
-                                                         │
-                                        ┌────────────────┴────────────────┐
-                                        ▼                                 ▼
-                                node-cron Schedulers             POST /webhook/whatsapp
-                           (Hourly Expiration Sweeps &        (Two-Way Reconfirm / Cancel
-                           15-Min WhatsApp Reminders)          Instant Table Release)
+         │                                               │
+         ▼                               ┌───────────────┴───────────────┐
+   EmailJS Dispatch                      ▼                               ▼
+(Client HTTPS Engine)           node-cron Schedulers           POST /webhook/whatsapp
+                            (Hourly Expiration Sweeps &      (Two-Way Reconfirm / Cancel
+                            15-Min WhatsApp Reminders)        Instant Table Release)
 ```
 
 The frontend is rendered server-side with custom EJS templates and styled with a luxury dark-theme aesthetic. Authentication and session state are managed via cryptographically signed HTTP cookies tied directly to a persistent MongoDB session store (`connect-mongo`). 
@@ -84,6 +90,7 @@ Reservia/
 ├── models/               # Mongoose schemas & compound indexes
 │   ├── login.js          # User schema with BCrypt pre-save hooks & roles
 │   ├── reservation.js    # Reservation schema with unique slot indexes & confirmation state
+│   ├── subscriber.js     # Newsletter subscriber schema & registration timestamp
 │   └── review.js         # Guest feedback & ratings schema
 ├── views/                # EJS templates (Luxury dark-theme interface)
 │   ├── index.ejs         # Hero landing page & dining highlights
@@ -115,6 +122,7 @@ Reservia/
 | `GET` | `/explore` | Curated dining atmosphere & restaurant showcase | Public |
 | `GET` | `/about` | Culinary story and kitchen heritage | Public |
 | `GET` | `/contact` | Concierge & guest inquiry form | Public |
+| `POST` | `/subscribe` | Newsletter signup & welcome email dispatch (Dual EmailJS/Nodemailer) | Public |
 | `POST` | `/sign-up` | Registers new user with input validation & BCrypt hashing | Public (Rate Limited) |
 | `POST` | `/login` | Authenticates user credentials & creates Mongo session | Public (Rate Limited) |
 | `GET` | `/logout` | Destroys active session & clears cookies | Authenticated |
